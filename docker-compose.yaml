@@ -1,0 +1,18 @@
+services:
+  tests:
+    build:
+      context: .
+      target: test
+    image: aur/foundation:tests
+    environment:
+      TEST_POSTGRES_HOST: sbx-postgres
+      TEST_SQLSERVER_HOST: sbx-sqlserver
+    volumes:
+      - ./artifacts:/src/artifacts
+    networks:
+      - dev-sbx
+
+networks:
+  dev-sbx:
+    external: true
+    name: dev-sbx

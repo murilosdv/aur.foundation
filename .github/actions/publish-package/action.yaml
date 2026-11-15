@@ -1,0 +1,23 @@
+name: Publish package
+description: >
+  Pushes the packages in ./nupkg (made by pack-package) to a NuGet feed (GitHub Packages of the repository owner by default).
+  A version that already exists in the feed fails the step.
+
+inputs:
+  api-key:
+    description: Key of the feed. For GitHub Packages, secrets.GITHUB_TOKEN with packages write permission.
+    required: true
+  source:
+    description: URL of the feed. Defaults to the GitHub Packages feed of the owner of the repository.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Push
+      shell: bash
+      env:
+        API_KEY: ${{ inputs.api-key }}
+        SOURCE: ${{ inputs.source != '' && inputs.source || format('https://nuget.pkg.github.com/{0}/index.json', github.repository_owner) }}
+      run: dotnet nuget push "./nupkg/*.nupkg" --no-symbols --api-key "$API_KEY" --source "$SOURCE"

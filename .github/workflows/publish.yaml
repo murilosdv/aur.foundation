@@ -1,0 +1,87 @@
+name: Publish
+
+# In order: which packages changed, then each of them on its own (version, tests, pack, publish) with CodeQL alongside, then one release.
+# Packages do not wait for each other or for CodeQL: a failure stops that package only. CodeQL reports to the Security tab and does not gate publishing.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip-version-sync:
+        description: Bypass the "src and Versions.props change together" check for this run (a one-off fix, for example a version corrected after the fact)
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  detect:
+    name: Changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.detect.outputs.packages }}
+      any: ${{ steps.detect.outputs.any }}
+      base-sha: ${{ steps.detect.outputs.base-sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect
+        id: detect
+        uses: ./.github/actions/detect-changed-packages
+        with:
+          base-sha: ${{ github.event.before }}
+          head-sha: ${{ github.sha }}
+
+  packages:
+    name: Package
+    needs: detect
+    if: needs.detect.outputs.any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        package-name: ${{ fromJSON(needs.detect.outputs.packages) }}
+    uses: ./.github/workflows/package-pipeline.yaml
+    with:
+      package-name: ${{ matrix.package-name }}
+      base-sha: ${{ needs.detect.outputs.base-sha }}
+      head-sha: ${{ github.sha }}
+      skip-version-sync: ${{ inputs.skip-version-sync || false }}
+
+  codeql:
+    name: CodeQL
+    needs: detect
+    if: needs.detect.outputs.any == 'true'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/codeql.yaml
+
+  release:
+    name: Release
+    needs: packages
+    if: always() && needs.packages.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download the published records
+        uses: actions/download-artifact@v4
+        with:
+          pattern: published-*
+          path: published
+          merge-multiple: true
+
+      - name: Create the release
+        uses: ./.github/actions/create-release

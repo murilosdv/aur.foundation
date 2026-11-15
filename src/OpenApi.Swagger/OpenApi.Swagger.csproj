@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>$(OpenApiSwaggerVersion)</Version>
+    <AssemblyName>Aurore.Foundation.OpenApi.Swagger</AssemblyName>
+    <RootNamespace>Aurore.Foundation.OpenApi.Swagger</RootNamespace>
+    <Product>Aurore Foundation @ OpenApi.Swagger</Product>
+    <Description>Swagger UI for the OpenAPI documents of the foundation: one document per API version and sign-in with PKCE.</Description>
+    <PackageTags>aurore openapi swagger swagger-ui aspnetcore api-reference</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="11.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenApi\OpenApi.csproj" />
+  </ItemGroup>
+
+</Project>

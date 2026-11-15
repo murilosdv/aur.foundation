@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>$(OpenApiVersion)</Version>
+    <AssemblyName>Aurore.Foundation.OpenApi</AssemblyName>
+    <RootNamespace>Aurore.Foundation.OpenApi</RootNamespace>
+    <Product>Aurore Foundation @ OpenApi</Product>
+    <Description>Provider-independent OpenAPI documents for ASP.NET Core: one per API version, document info, security schemes and the documented headers of the foundation. Add the Scalar or the Swagger package for a UI.</Description>
+    <PackageTags>aurore openapi aspnetcore security-schemes api-versioning</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspNetCore\AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

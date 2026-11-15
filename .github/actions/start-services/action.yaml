@@ -1,0 +1,17 @@
+name: Start services
+description: >
+  Starts the database servers the tests need as containers and waits until they are healthy. Defined once, so any workflow (of this repository or,
+  with uses: murilosdv/aur.foundation/.github/actions/start-services@main, of another) asks for the ones it needs by name.
+
+inputs:
+  services:
+    description: Space separated names from docker-compose.yaml next to this file (postgres, sqlserver). Empty starts nothing.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Start ${{ inputs.services }}
+      if: inputs.services != ''
+      shell: bash
+      run: docker compose --file "${{ github.action_path }}/docker-compose.yaml" up --detach --wait ${{ inputs.services }}

@@ -1,0 +1,30 @@
+name: Create release
+description: >
+  Creates a GitHub release for the packages published in a run. Reads the records ("<name> <version>" files) the publishing jobs left in a folder,
+  uses the Unreleased section of the changelog as notes and marks the release as pre-release when every version is. Does nothing without records.
+  The checkout must be the commit being released, and the job needs contents write permission.
+
+inputs:
+  records-dir:
+    description: Folder with the *.txt records of the published packages.
+    required: false
+    default: published
+  changelog:
+    description: Changelog in Keep a Changelog format, whose Unreleased section becomes the notes.
+    required: false
+    default: CHANGELOG.md
+  token:
+    description: Token that creates the release.
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create the release
+      shell: bash
+      env:
+        RECORDS_DIR: ${{ inputs.records-dir }}
+        CHANGELOG: ${{ inputs.changelog }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: bash "${{ github.action_path }}/../../workflows/scripts/create-release.sh"

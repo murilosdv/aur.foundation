@@ -1,0 +1,22 @@
+name: Pack package
+description: >
+  Packs a project into ./nupkg. Done on pull requests too, so a package that does not pack fails before it is merged.
+
+inputs:
+  project:
+    description: Path of the project to pack.
+    required: true
+  configuration:
+    description: Build configuration.
+    required: false
+    default: Release
+
+runs:
+  using: composite
+  steps:
+    - name: Pack
+      shell: bash
+      env:
+        PROJECT: ${{ inputs.project }}
+        CONFIGURATION: ${{ inputs.configuration }}
+      run: dotnet pack "$PROJECT" --configuration "$CONFIGURATION" --output ./nupkg

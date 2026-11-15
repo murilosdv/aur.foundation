@@ -1,0 +1,119 @@
+name: Package pipeline
+
+# What happens to one package that changed. verify: version, servers, build and test, pack. publish (only when asked): push exactly what verify packed.
+# One package never waits for another: a failure stops that package only.
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: Package name, as in the folders src/<name> and tests/Tests.<name>.
+        required: true
+        type: string
+      base-sha:
+        description: Commit SHA before the change (the base-sha output of detect-changed-packages).
+        required: true
+        type: string
+      head-sha:
+        description: Commit SHA being built.
+        required: true
+        type: string
+      publish:
+        description: Push to GitHub Packages after a successful verify. False for pull requests.
+        required: false
+        type: boolean
+        default: true
+      collect-coverage:
+        description: Collect coverage and add a summary to the job (informational, never fails the job).
+        required: false
+        type: boolean
+        default: false
+      skip-version-sync:
+        description: Bypass the "src and Versions.props change together" check. Only set by the manual run of the publish workflow.
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  verify:
+    name: Verify ${{ inputs.package-name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        uses: ./.github/actions/check-version-sync
+        with:
+          package-name: ${{ inputs.package-name }}
+          base-sha: ${{ inputs.base-sha }}
+          head-sha: ${{ inputs.head-sha }}
+          skip-check: ${{ inputs.skip-version-sync }}
+
+      - name: Start the servers the tests need
+        uses: ./.github/actions/start-services
+        with:
+          services: ${{ inputs.package-name == 'EntityFrameworkCore.Postgres' && 'postgres' || inputs.package-name == 'EntityFrameworkCore.SqlServer' && 'sqlserver' || '' }}
+
+      - name: Build and test
+        uses: ./.github/actions/build-test
+        with:
+          project: src/${{ inputs.package-name }}/${{ inputs.package-name }}.csproj
+          test-project: tests/Tests.${{ inputs.package-name }}
+          coverage-file: ${{ inputs.collect-coverage && format('{0}.cobertura.xml', inputs.package-name) || '' }}
+
+      - name: Summarize coverage
+        if: inputs.collect-coverage == true
+        uses: ./.github/actions/coverage-summary
+        with:
+          name: ${{ inputs.package-name }}
+          file-name: ${{ inputs.package-name }}.cobertura.xml
+
+      - name: Pack
+        uses: ./.github/actions/pack-package
+        with:
+          project: src/${{ inputs.package-name }}/${{ inputs.package-name }}.csproj
+
+      - name: Record the version
+        if: inputs.publish == true
+        env:
+          PACKAGE: ${{ inputs.package-name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: bash .github/workflows/scripts/record-published-version.sh
+
+      - name: Keep the package
+        if: inputs.publish == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ inputs.package-name }}
+          path: |
+            nupkg/*.nupkg
+            published/${{ inputs.package-name }}.txt
+          if-no-files-found: error
+
+  publish:
+    name: Publish ${{ inputs.package-name }}
+    needs: verify
+    if: inputs.publish == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download the verified package
+        uses: actions/download-artifact@v4
+        with:
+          name: package-${{ inputs.package-name }}
+
+      - name: Publish
+        uses: ./.github/actions/publish-package
+        with:
+          api-key: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload the record
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-${{ inputs.package-name }}
+          path: published/${{ inputs.package-name }}.txt
