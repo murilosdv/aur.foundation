@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>$(EntityFrameworkCoreVersion)</Version>
+    <AssemblyName>Aurore.Foundation.EntityFrameworkCore</AssemblyName>
+    <RootNamespace>Aurore.Foundation.EntityFrameworkCore</RootNamespace>
+    <Product>Aurore Foundation @ EntityFrameworkCore</Product>
+    <Description>Provider-independent Entity Framework Core support: conventions, soft delete, timestamps, paging and unique-violation errors. Add a provider package next to it.</Description>
+    <PackageTags>aurore entityframeworkcore efcore soft-delete pagination</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore.Postgres" />
+    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore.SqlServer" />
+    <InternalsVisibleTo Include="Aurore.Foundation.Tests.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>

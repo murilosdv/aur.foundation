@@ -1,0 +1,18 @@
+---
+name: Feature request
+about: Suggest an addition or change to a Foundation package
+title: ""
+labels: enhancement
+---
+
+## Package
+
+<!-- Which package(s): Core, AspNetCore, OpenApi, OpenApi.Scalar, OpenApi.Swagger, Telemetry, EntityFrameworkCore, EntityFrameworkCore.Postgres, EntityFrameworkCore.SqlServer, or a new one -->
+
+## Problem
+
+<!-- What can't you do today, or what's awkward? -->
+
+## Proposed solution
+
+## Alternatives considered

@@ -1,0 +1,26 @@
+name: Coverage summary
+description: >
+  Turns a Cobertura file into a table in the summary of the job. Informational: it only reports. Needs the .NET SDK on the runner.
+
+inputs:
+  name:
+    description: Title of the summary, usually the package or project.
+    required: true
+  file-name:
+    description: File name of the Cobertura report (searched under artifacts/test-results).
+    required: true
+  class-filters:
+    description: Classes left out of the numbers (generated code), in the syntax of ReportGenerator.
+    required: false
+    default: "-Microsoft.AspNetCore.OpenApi.Generated;-System.Runtime.CompilerServices;-System.Text.RegularExpressions.Generated;-Microsoft.Extensions.Logging.Generated"
+
+runs:
+  using: composite
+  steps:
+    - name: Summarize coverage of ${{ inputs.name }}
+      shell: bash
+      env:
+        NAME: ${{ inputs.name }}
+        FILE_NAME: ${{ inputs.file-name }}
+        CLASS_FILTERS: ${{ inputs.class-filters }}
+      run: bash "${{ github.action_path }}/../../workflows/scripts/summarize-coverage.sh"

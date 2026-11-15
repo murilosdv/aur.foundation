@@ -1,0 +1,22 @@
+name: Conventional commits
+description: >
+  Fails when a commit between two SHAs (merges excluded) does not follow Conventional Commits (https://www.conventionalcommits.org/en/v1.0.0/).
+  The checkout must have the full history (fetch-depth: 0).
+
+inputs:
+  base-sha:
+    description: Commit SHA to diff from (exclusive).
+    required: true
+  head-sha:
+    description: Commit SHA to diff to (inclusive).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Validate commit messages
+      shell: bash
+      env:
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+      run: bash "${{ github.action_path }}/../../workflows/scripts/validate-conventional-commits.sh"

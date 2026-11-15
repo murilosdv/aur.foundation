@@ -1,0 +1,86 @@
+name: PR check
+
+# In order: commit messages and formatting (cheap, no package needed), which packages changed, then each of them (version, tests, pack) with CodeQL alongside. Nothing is published.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  conventional-commit:
+    name: Conventional commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        uses: ./.github/actions/conventional-commits
+        with:
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Verify formatting matches .editorconfig
+        run: dotnet format Foundation.slnx --verify-no-changes
+
+  detect:
+    name: Changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.detect.outputs.packages }}
+      any: ${{ steps.detect.outputs.any }}
+      base-sha: ${{ steps.detect.outputs.base-sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect
+        id: detect
+        uses: ./.github/actions/detect-changed-packages
+        with:
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
+
+  packages:
+    name: Package
+    needs: detect
+    if: needs.detect.outputs.any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        package-name: ${{ fromJSON(needs.detect.outputs.packages) }}
+    uses: ./.github/workflows/package-pipeline.yaml
+    with:
+      package-name: ${{ matrix.package-name }}
+      base-sha: ${{ needs.detect.outputs.base-sha }}
+      head-sha: ${{ github.event.pull_request.head.sha }}
+      publish: false
+      collect-coverage: true
+
+  codeql:
+    name: CodeQL
+    needs: detect
+    if: needs.detect.outputs.any == 'true'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/codeql.yaml

@@ -1,0 +1,48 @@
+name: Build and test
+description: >
+  Installs the .NET SDK, builds a project and runs the tests of a test project, optionally collecting Cobertura coverage
+  (pair it with the coverage-summary action to report it).
+
+inputs:
+  project:
+    description: Path of the project (or solution) to build.
+    required: true
+  test-project:
+    description: Folder of the test project. Empty, or a folder without a project, skips the tests.
+    required: false
+    default: ""
+  configuration:
+    description: Build configuration.
+    required: false
+    default: Release
+  coverage-file:
+    description: File name of the Cobertura report to produce. Empty collects no coverage.
+    required: false
+    default: ""
+  global-json-file:
+    description: global.json that selects the SDK.
+    required: false
+    default: global.json
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: ${{ inputs.global-json-file }}
+
+    - name: Build
+      shell: bash
+      env:
+        PROJECT: ${{ inputs.project }}
+        CONFIGURATION: ${{ inputs.configuration }}
+      run: dotnet build "$PROJECT" --configuration "$CONFIGURATION"
+
+    - name: Test
+      shell: bash
+      env:
+        TEST_PROJECT: ${{ inputs.test-project }}
+        CONFIGURATION: ${{ inputs.configuration }}
+        COVERAGE_FILE: ${{ inputs.coverage-file }}
+      run: bash "${{ github.action_path }}/../../workflows/scripts/run-tests.sh"

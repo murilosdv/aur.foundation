@@ -1,0 +1,34 @@
+name: Detect changed packages
+description: >
+  Lists the packages (folders under src) whose code or version in Versions.props changed between two commits, as a JSON array for a job matrix.
+  The checkout must have the full history (fetch-depth: 0).
+
+inputs:
+  base-sha:
+    description: Commit SHA before the change. Empty or unknown (first push, new branch) compares against the parent of head-sha.
+    required: false
+    default: ""
+  head-sha:
+    description: Commit SHA being built.
+    required: true
+
+outputs:
+  packages:
+    description: JSON array of the changed package names, for example ["Core","OpenApi"].
+    value: ${{ steps.detect.outputs.packages }}
+  any:
+    description: "'true' when at least one package changed."
+    value: ${{ steps.detect.outputs.any }}
+  base-sha:
+    description: The commit the change was compared against, to hand to the next steps.
+    value: ${{ steps.detect.outputs.base-sha }}
+
+runs:
+  using: composite
+  steps:
+    - id: detect
+      shell: bash
+      env:
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+      run: bash "${{ github.action_path }}/../../workflows/scripts/detect-changed-packages.sh"
