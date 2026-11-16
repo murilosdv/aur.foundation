@@ -13,7 +13,9 @@ public static class UniqueViolationConfiguration
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configure">Maps database constraint names to application errors.</param>
-    public static IServiceCollection AddUniqueViolationErrors(this IServiceCollection services, Action<UniqueViolationMap> configure)
+    public static IServiceCollection AddUniqueViolationErrors(
+        this IServiceCollection services,
+        Action<UniqueViolationMap> configure)
     {
         var map = new UniqueViolationMap();
         configure(map);

@@ -68,7 +68,11 @@ public sealed class SqlServerOptionsValidatorTests
     [InlineData(true, "True", "True", false)] // the certificate is trusted without validation
     [InlineData(true, "Optional", "False", false)] // no encryption
     [InlineData(true, "True", "False", true)]
-    public void ProductionRequiresEncryptionAndACertificate(bool isProduction, string encrypt, string trustCertificate, bool expectedValid)
+    public void ProductionRequiresEncryptionAndACertificate(
+        bool isProduction,
+        string encrypt,
+        string trustCertificate,
+        bool expectedValid)
     {
         // Arrange
         var validator = new SqlServerOptionsValidator(isProduction);

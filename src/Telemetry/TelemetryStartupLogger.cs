@@ -12,7 +12,10 @@ namespace Aurore.Foundation.Telemetry;
 /// logged once at startup to make a wrong endpoint or protocol easy to spot.
 /// </summary>
 [ExcludeFromCodeCoverage]
-internal sealed class TelemetryStartupLogger(ILogger<TelemetryStartupLogger> logger, TelemetryOptions telemetry) : IHostedService
+internal sealed class TelemetryStartupLogger(
+    ILogger<TelemetryStartupLogger> logger,
+    TelemetryOptions telemetry)
+    : IHostedService
 {
     /// <param name="cancellationToken">A token to cancel the start.</param>
     public Task StartAsync(CancellationToken cancellationToken)

@@ -39,7 +39,9 @@ public static class CorsConfiguration
     /// CORS is optional: without policies nothing is registered and browsers are limited to same-origin calls.
     /// Configure policies only when a browser app calls this service directly from another origin.
     /// </summary>
-    internal static IHostApplicationBuilder AddStandardCorsPolicies(this IHostApplicationBuilder builder, IReadOnlyDictionary<string, CorsPolicyOptions> policies)
+    internal static IHostApplicationBuilder AddStandardCorsPolicies(
+        this IHostApplicationBuilder builder,
+        IReadOnlyDictionary<string, CorsPolicyOptions> policies)
     {
         if (policies.Count is 0)
             return builder;
@@ -63,7 +65,9 @@ public static class CorsConfiguration
     /// <summary>
     /// Pairs with AddStandardCorsPolicies: UseCors() fails at startup when CORS services were never registered.
     /// </summary>
-    internal static IApplicationBuilder UseStandardCors(this IApplicationBuilder builder, IReadOnlyDictionary<string, CorsPolicyOptions> policies)
+    internal static IApplicationBuilder UseStandardCors(
+        this IApplicationBuilder builder,
+        IReadOnlyDictionary<string, CorsPolicyOptions> policies)
     {
         return policies.Count > 0 ? builder.UseCors() : builder;
     }

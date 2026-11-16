@@ -103,7 +103,10 @@ public static class MinimalApiConfiguration
         return custom;
     }
 
-    private static RouteGroupBuilder ConfigureProblems(this RouteGroupBuilder builder, ResourceGroup group, IReadOnlyList<int> globalProblems)
+    private static RouteGroupBuilder ConfigureProblems(
+        this RouteGroupBuilder builder,
+        ResourceGroup group,
+        IReadOnlyList<int> globalProblems)
     {
         foreach (var problem in group.Problems.Except(globalProblems))
             builder.ProducesProblem(problem);

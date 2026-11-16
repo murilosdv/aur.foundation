@@ -14,7 +14,10 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Middlewares;
 /// Runs after authentication. Puts the user id in the request context and, encrypted when privacy is on, in the log scope
 /// and on the current span (the span tag is protected again on export by the privacy trace processor).
 /// </summary>
-internal sealed class RequestUserMiddleware(RequestDelegate next, IPrivacyProtector privacy, ILogger<RequestUserMiddleware> logger)
+internal sealed class RequestUserMiddleware(
+    RequestDelegate next,
+    IPrivacyProtector privacy,
+    ILogger<RequestUserMiddleware> logger)
 {
     /// <summary>
     /// Adds the authenticated user's id to the context, the span and the log scope.

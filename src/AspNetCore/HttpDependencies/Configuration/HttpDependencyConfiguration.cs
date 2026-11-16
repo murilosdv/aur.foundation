@@ -24,7 +24,10 @@ public static class HttpDependencyConfiguration
     /// <param name="name">The name of the dependency, used to resolve the client and to find its token.</param>
     /// <param name="dependency">The base URL, the default request headers, whether to pass on the correlation id, and the health check settings.</param>
     /// <returns>The client builder, to chain authentication or other handlers.</returns>
-    public static IHttpClientBuilder AddStandardHttpDependency(this IServiceCollection services, string name, HttpDependencyOptions dependency)
+    public static IHttpClientBuilder AddStandardHttpDependency(
+        this IServiceCollection services,
+        string name,
+        HttpDependencyOptions dependency)
     {
         if (Uri.TryCreate(dependency.BaseUrl, UriKind.Absolute, out _) is false)
             throw new InvalidOperationException($"Dependency '{name}' has an invalid BaseUrl '{dependency.BaseUrl}'. It must be an absolute URL, e.g. 'https://orders.internal'.");
@@ -88,7 +91,9 @@ public static class HttpDependencyConfiguration
     /// <param name="builder">The client builder.</param>
     /// <param name="options">The token URL, client and scopes. Nothing is added when null.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static IHttpClientBuilder AddStandardClientCredentials(this IHttpClientBuilder builder, ClientCredentialsOptions? options)
+    public static IHttpClientBuilder AddStandardClientCredentials(
+        this IHttpClientBuilder builder,
+        ClientCredentialsOptions? options)
     {
         if (options is null || Uri.TryCreate(options.TokenUrl, UriKind.Absolute, out _) is false)
             throw new InvalidOperationException($"Dependency '{builder.Name}' needs a ClientCredentials section with an absolute TokenUrl.");
@@ -108,7 +113,9 @@ public static class HttpDependencyConfiguration
     /// <summary>
     /// Returns the dependency configured under <paramref name="name"/>, or throws naming the missing key.
     /// </summary>
-    public static HttpDependencyOptions GetRequired(this IReadOnlyDictionary<string, HttpDependencyOptions> dependencies, string name)
+    public static HttpDependencyOptions GetRequired(
+        this IReadOnlyDictionary<string, HttpDependencyOptions> dependencies,
+        string name)
     {
         return dependencies.TryGetValue(name, out var dependency)
             ? dependency

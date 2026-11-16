@@ -20,7 +20,10 @@ namespace Aurore.Foundation.AspNetCore.Authentication.Handlers;
 /// The caller identity is the client name; its Roles become role claims and its Scopes one "scope" claim, so the
 /// RequireRoles/RequireScopes work for API-key callers exactly as for JWT callers.
 /// </summary>
-internal sealed class ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+internal sealed class ApiKeyAuthenticationHandler(
+    IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder)
     : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>(options, logger, encoder)
 {
     /// <summary>

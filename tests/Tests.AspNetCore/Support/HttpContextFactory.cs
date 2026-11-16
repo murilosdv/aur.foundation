@@ -15,7 +15,11 @@ internal static class HttpContextFactory
     /// <summary>
     /// A context with logging available and a writable response body. An authenticated user is added when a name is given.
     /// </summary>
-    public static DefaultHttpContext Create(string? user = null, string method = "GET", string path = "/", Action<IServiceCollection>? configure = null)
+    public static DefaultHttpContext Create(
+        string? user = null,
+        string method = "GET",
+        string path = "/",
+        Action<IServiceCollection>? configure = null)
     {
         var services = new ServiceCollection().AddLogging();
         configure?.Invoke(services);
@@ -26,7 +30,11 @@ internal static class HttpContextFactory
     /// <summary>
     /// A context that resolves its services from the given provider, for tests that need several requests to share state.
     /// </summary>
-    public static DefaultHttpContext Create(IServiceProvider services, string? user = null, string method = "GET", string path = "/")
+    public static DefaultHttpContext Create(
+        IServiceProvider services,
+        string? user = null,
+        string method = "GET",
+        string path = "/")
     {
         var http = new DefaultHttpContext { RequestServices = services };
         http.Request.Method = method;

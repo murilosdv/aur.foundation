@@ -22,7 +22,10 @@ internal static class RequestValidationFilter
     private static readonly MethodInfo _validateMethod = typeof(RequestValidationFilter)
         .GetMethod(nameof(ValidateAsync), BindingFlags.NonPublic | BindingFlags.Static)!;
 
-    private delegate Task<List<ValidationFailure>> ValidateArgument(IServiceProvider services, object argument, CancellationToken cancellationToken);
+    private delegate Task<List<ValidationFailure>> ValidateArgument(
+        IServiceProvider services,
+        object argument,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// The endpoint filter factory: returns the next delegate untouched when no parameter has a validator.

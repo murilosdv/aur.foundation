@@ -27,7 +27,11 @@ public abstract class FeatureBase : IFeature
     /// <summary>
     /// Runs the handler inside the decorators of the feature. Only called when the feature has a pipeline.
     /// </summary>
-    internal ValueTask<Result> RunAsync(Type requestType, object request, CancellationToken cancellationToken, FeatureDelegate handler)
+    internal ValueTask<Result> RunAsync(
+        Type requestType,
+        object request,
+        CancellationToken cancellationToken,
+        FeatureDelegate handler)
     {
         var context = new FeatureContext
         {

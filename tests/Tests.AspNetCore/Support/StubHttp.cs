@@ -9,7 +9,10 @@ namespace Aurore.Foundation.Tests.AspNetCore.Support;
 /// <summary>
 /// A handler that answers every request itself and keeps what it was sent, for the tests of outbound HTTP components.
 /// </summary>
-internal sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> respond, TimeSpan? delay = null) : HttpMessageHandler
+internal sealed class StubHandler(
+    Func<HttpRequestMessage, HttpResponseMessage> respond,
+    TimeSpan? delay = null)
+    : HttpMessageHandler
 {
     private readonly Lock _gate = new();
 
@@ -28,7 +31,9 @@ internal sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> 
         }
     }
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
         var body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken);
 

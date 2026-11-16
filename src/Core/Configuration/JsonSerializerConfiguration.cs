@@ -60,7 +60,10 @@ public static class JsonSerializerConfiguration
     /// <param name="source">The object to serialize.</param>
     /// <param name="filePath">The file to write. WSL and Windows paths are converted to the style of the running system.</param>
     /// <param name="optionsAction">Adjusts the options for this call only.</param>
-    public static void SerializeToFile(this object source, string filePath, Action<JsonSerializerOptions>? optionsAction = null)
+    public static void SerializeToFile(
+        this object source,
+        string filePath,
+        Action<JsonSerializerOptions>? optionsAction = null)
     {
         filePath = Path.NormalizeRuntimePath(filePath);
 

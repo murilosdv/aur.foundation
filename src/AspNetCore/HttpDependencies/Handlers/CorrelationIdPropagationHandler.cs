@@ -18,7 +18,9 @@ internal sealed class CorrelationIdPropagationHandler(IHttpContextAccessor httpC
     /// IHttpClientFactory creates handlers in their own DI scope, so the request's RequestContext is read through the
     /// current HttpContext instead of being injected. Outside a request (background work) nothing is added.
     /// </summary>
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
         var correlationId = httpContextAccessor.HttpContext?.RequestServices.GetService<RequestContext>()?.CorrelationId;
 

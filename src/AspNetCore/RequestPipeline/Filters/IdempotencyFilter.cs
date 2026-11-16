@@ -22,7 +22,11 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Filters;
 /// and an Idempotency-Replayed header. Per-request headers (Correlation-Id, Date, ...) are those of the new request.
 /// This is a convenience for clients that retry; guarantee uniqueness in the database too.
 /// </summary>
-internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions options, RequestContext requestContext) : IEndpointFilter
+internal sealed class IdempotencyFilter(
+    HybridCache cache,
+    IdempotencyOptions options,
+    RequestContext requestContext)
+    : IEndpointFilter
 {
     /// <summary>
     /// Runs the endpoint the first time a key is seen and replays the stored result when the same caller repeats it.
@@ -98,7 +102,10 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
         return http.Response.Headers.ToDictionary(x => x.Key, x => x.Value.ToString(), StringComparer.OrdinalIgnoreCase);
     }
 
-    private static IdempotencyCacheEntry? Capture(HttpContext http, object? result, Dictionary<string, string> headersBefore)
+    private static IdempotencyCacheEntry? Capture(
+        HttpContext http,
+        object? result,
+        Dictionary<string, string> headersBefore)
     {
         while (result is INestedHttpResult nested)
             result = nested.Result;
@@ -137,7 +144,10 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
         return new IdempotencyCacheEntry(status, body, headers);
     }
 
-    private sealed record IdempotencyCacheEntry(int StatusCode, JsonElement? Body, Dictionary<string, string[]> Headers);
+    private sealed record IdempotencyCacheEntry(
+        int StatusCode,
+        JsonElement? Body,
+        Dictionary<string, string[]> Headers);
 
     private sealed class NotCacheableResultException : Exception;
 

@@ -1,10 +1,7 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Aurore.Foundation.Core.HealthChecks.Constants;
 using Aurore.Foundation.EntityFrameworkCore.SqlServer.Extensions;
 using Aurore.Foundation.EntityFrameworkCore.SqlServer.Models;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -28,25 +25,5 @@ public static class SqlServerHealthCheckConfiguration
             [HealthCheckProperties.Tags.Readiness, HealthCheckProperties.Tags.TypeDatabase, HealthCheckProperties.Tags.Critical],
             TimeSpan.FromSeconds(HealthCheckProperties.Configuration.DefaultTimeoutSeconds)));
         return services;
-    }
-}
-
-internal sealed class SqlServerHealthCheck(string connectionString) : IHealthCheck
-{
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync(cancellationToken);
-            await using var command = connection.CreateCommand();
-            command.CommandText = "SELECT 1;";
-            var result = await command.ExecuteScalarAsync(cancellationToken);
-            return result is 1 ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy("SQL Server is unavailable.");
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            return new HealthCheckResult(context.Registration.FailureStatus, "Could not reach SQL Server.");
-        }
     }
 }

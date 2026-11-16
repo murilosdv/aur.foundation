@@ -21,7 +21,9 @@ public static class VersioningConfiguration
     /// <param name="services">The service collection.</param>
     /// <param name="endpoints">The catalog of the resource groups and their versions.</param>
     /// <returns>The same service collection, for chaining.</returns>
-    public static IServiceCollection AddStandardApiVersioning(this IServiceCollection services, MinimalEndpointCatalog endpoints)
+    public static IServiceCollection AddStandardApiVersioning(
+        this IServiceCollection services,
+        MinimalEndpointCatalog endpoints)
     {
         services
             .AddApiVersioning(options =>

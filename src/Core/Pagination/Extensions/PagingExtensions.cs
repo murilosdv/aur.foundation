@@ -229,7 +229,12 @@ public static class PagingExtensions
         return items;
     }
 
-    private static void CheckRange(DateTimeOffset? from, DateTimeOffset? to, string fromName, string toName, Problems problems)
+    private static void CheckRange(
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        string fromName,
+        string toName,
+        Problems problems)
     {
         if (from is { } start && to is { } end && start >= end)
             problems.Add(toName, $"'{toName}' must be after '{fromName}'.");

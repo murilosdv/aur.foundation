@@ -249,7 +249,14 @@ public sealed class CursorPagingExtensionsTests
         High,
     }
 
-    private sealed record Item(int Id, string Name, int Group, Level Level, DateTimeOffset Created, Guid Token, DateTimeOffset? Removed);
+    private sealed record Item(
+        int Id,
+        string Name,
+        int Group,
+        Level Level,
+        DateTimeOffset Created,
+        Guid Token,
+        DateTimeOffset? Removed);
 
     private sealed record Keyless(string Name);
 

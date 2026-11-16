@@ -1,8 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Aurore.Foundation.Core.Errors;
+using Aurore.Foundation.Core.Features;
+using Aurore.Foundation.Core.Features.Attributes;
+using Aurore.Foundation.Core.Results;
 using Aurore.Foundation.Core.Validation;
 using Aurore.Foundation.Tests.Core.Features.Support;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aurore.Foundation.Tests.Core.Features.Decorators;
@@ -124,5 +128,36 @@ public sealed class ValidationDecoratorTests
         // Assert
         Assert.True(validated.IsFailure);
         Assert.True(plain.IsSuccess);
+    }
+}
+
+public sealed class PlainBusinessValidator : FeatureValidator<Ping>
+{
+    public PlainBusinessValidator()
+    {
+        RuleFor(x => x.Name).NotEqual("banned").WithMessage("The name is banned.");
+    }
+}
+
+public sealed class TakenNameValidator : FeatureValidator<Ping>
+{
+    public static readonly ApplicationError Taken = ApplicationError.Conflict("test.taken", "The name is taken.");
+
+    public TakenNameValidator()
+    {
+        RuleFor(x => x.Name).NotEqual("taken").WithMessage("The name is taken.");
+    }
+
+    public override ApplicationError? Error => Taken;
+}
+
+[WithValidation]
+public sealed class ValidatedFeature(Trace trace) : Feature<Ping, string>
+{
+    protected override ValueTask<Result<string>> ExecuteAsync(Ping request, CancellationToken cancellationToken)
+    {
+        trace.Steps.Add("feature");
+
+        return ValueTask.FromResult(Result<string>.Success("ok"));
     }
 }

@@ -1,4 +1,3 @@
-using Aurore.Foundation.Core.Features.Attributes;
 using Aurore.Foundation.Core.Features.Configuration;
 
 namespace Aurore.Foundation.EntityFrameworkCore.SqlServer.Features;
@@ -15,13 +14,4 @@ public static class UniqueViolationConfiguration
     {
         return builder.With<UniqueViolationDecorator>();
     }
-}
-
-/// <summary>
-/// Enables SQL Server unique-violation handling for a single feature.
-/// </summary>
-public sealed class WithUniqueViolationAttribute : FeatureDecoratorAttribute
-{
-    /// <inheritdoc />
-    public override System.Type DecoratorType => typeof(UniqueViolationDecorator);
 }

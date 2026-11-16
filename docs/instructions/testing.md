@@ -9,6 +9,7 @@ Our own logic, never the framework or a package: a test that would pass with our
 - Explicit `// Arrange`, `// Act`, `// Assert` sections (`// Arrange & Act` when they merge) and a `DisplayName` that reads as a rule.
 - Scenario sets use `TheoryData` with `MemberData`, not long `InlineData` lists.
 - Test folders mirror the source folders. `--filter-trait "Feature=Idempotency"` runs one feature.
+- A helper used only inside one test file stays in it; a stub, sample or fixture that several tests use is its own file ([code style](./code-style.md)).
 
 | Project | Holds |
 |---|---|

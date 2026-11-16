@@ -45,7 +45,10 @@ public static class OpenApiExtensions
     /// <param name="version">The API version the document describes.</param>
     /// <param name="appInfo">The name, description and maintainer to show.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardDocumentInfo(this OpenApiOptions options, MinimalEndpointVersion version, AppInformationOptions appInfo)
+    public static OpenApiOptions AddStandardDocumentInfo(
+        this OpenApiOptions options,
+        MinimalEndpointVersion version,
+        AppInformationOptions appInfo)
     {
         var notice = version switch
         {
@@ -81,7 +84,11 @@ public static class OpenApiExtensions
     /// <param name="authenticationScheme">The ASP.NET Core authentication scheme this documented scheme stands for.</param>
     /// <param name="schema">The scheme to document.</param>
     /// <param name="scopes">The scopes to list with the requirement.</param>
-    public static OpenApiOptions AddStandardSecuritySchemeAndRequirement(this OpenApiOptions options, string authenticationScheme, OpenApiSecurityScheme schema, params string[] scopes)
+    public static OpenApiOptions AddStandardSecuritySchemeAndRequirement(
+        this OpenApiOptions options,
+        string authenticationScheme,
+        OpenApiSecurityScheme schema,
+        params string[] scopes)
     {
         if (schema.Name.HasValue() is false)
             throw new ArgumentException("Security scheme must have a valid Name property.", nameof(schema));
@@ -178,7 +185,9 @@ public static class OpenApiExtensions
     /// <param name="options">The OpenAPI options.</param>
     /// <param name="identityProvider">The identity provider whose discovery document is linked.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardOidcSecurity(this OpenApiOptions options, IdentityProviderOptions identityProvider)
+    public static OpenApiOptions AddStandardOidcSecurity(
+        this OpenApiOptions options,
+        IdentityProviderOptions identityProvider)
     {
         return options.AddStandardSecuritySchemeAndRequirement(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
         {
@@ -195,7 +204,9 @@ public static class OpenApiExtensions
     /// <param name="options">The OpenAPI options.</param>
     /// <param name="identityProvider">The identity provider: authorization and token paths and the scopes to list.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardOAuth2Security(this OpenApiOptions options, IdentityProviderOptions identityProvider)
+    public static OpenApiOptions AddStandardOAuth2Security(
+        this OpenApiOptions options,
+        IdentityProviderOptions identityProvider)
     {
         var authority = identityProvider.AuthorityUrl.TrimEnd('/');
         var tokenUrl = new Uri($"{authority}/{identityProvider.TokenPath.TrimStart('/')}");

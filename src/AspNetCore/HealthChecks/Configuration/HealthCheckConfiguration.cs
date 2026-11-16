@@ -79,7 +79,9 @@ public static class HealthCheckConfiguration
         return app;
     }
 
-    private static HealthCheckOptions CreateOptions(Func<HealthCheckRegistration, bool> predicate, bool includeDependencies)
+    private static HealthCheckOptions CreateOptions(
+        Func<HealthCheckRegistration, bool> predicate,
+        bool includeDependencies)
     {
         return new HealthCheckOptions
         {

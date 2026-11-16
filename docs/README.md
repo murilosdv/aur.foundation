@@ -67,3 +67,4 @@ Logs, metrics and traces over OTLP: every setting, what is collected, custom met
 - [Shared actions](./instructions/shared-actions.md): actions other repositories can reuse.
 - [Changelog](./instructions/changelog.md)
 - [XML documentation](./instructions/xml-docs.md)
+- [Code style](./instructions/code-style.md): files, pattern matching, braces, long declarations.

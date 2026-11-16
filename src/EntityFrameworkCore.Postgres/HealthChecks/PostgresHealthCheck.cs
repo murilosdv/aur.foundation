@@ -14,10 +14,15 @@ namespace Aurore.Foundation.EntityFrameworkCore.Postgres.HealthChecks;
 /// </summary>
 /// <param name="logger">Records why a check failed.</param>
 /// <param name="serviceProvider">Resolves the data source.</param>
-internal sealed class PostgresHealthCheck(ILogger<PostgresHealthCheck> logger, IServiceProvider serviceProvider) : IHealthCheck
+internal sealed class PostgresHealthCheck(
+    ILogger<PostgresHealthCheck> logger,
+    IServiceProvider serviceProvider)
+    : IHealthCheck
 {
     /// <inheritdoc />
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
     {
         try
         {

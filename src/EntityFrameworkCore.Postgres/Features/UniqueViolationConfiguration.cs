@@ -1,5 +1,3 @@
-using System;
-using Aurore.Foundation.Core.Features.Attributes;
 using Aurore.Foundation.Core.Features.Configuration;
 
 namespace Aurore.Foundation.EntityFrameworkCore.Postgres.Features;
@@ -17,13 +15,4 @@ public static class UniqueViolationConfiguration
         return builder.With<UniqueViolationDecorator>();
     }
 
-}
-
-/// <summary>
-/// Enables the unique violation decorator for this feature.
-/// </summary>
-public sealed class WithUniqueViolationAttribute : FeatureDecoratorAttribute
-{
-    /// <inheritdoc />
-    public override Type DecoratorType => typeof(UniqueViolationDecorator);
 }

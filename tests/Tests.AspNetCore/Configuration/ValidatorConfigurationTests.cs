@@ -81,9 +81,33 @@ public sealed class ValidatorConfigurationTests
 
 internal sealed record ScanRequest(string Name);
 
+internal sealed class ScanRequestValidator : RequestValidator<ScanRequest>
+{
+    public ScanRequestValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+    }
+}
+
 internal sealed record ScanEntity(string Status);
 
+internal sealed class ScanEntityValidator : FeatureValidator<ScanEntity>
+{
+    public ScanEntityValidator()
+    {
+        RuleFor(x => x.Status).NotEmpty();
+    }
+}
+
 internal sealed record ScanPlain(string Value);
+
+internal sealed class ScanPlainValidator : AbstractValidator<ScanPlain>
+{
+    public ScanPlainValidator()
+    {
+        RuleFor(x => x.Value).NotEmpty();
+    }
+}
 
 internal sealed record ScanBoth(string Name);
 
@@ -100,29 +124,5 @@ internal sealed class ScanBothBusinessValidator : FeatureValidator<ScanBoth>
     public ScanBothBusinessValidator()
     {
         RuleFor(x => x.Name).NotEqual("taken");
-    }
-}
-
-internal sealed class ScanPlainValidator : AbstractValidator<ScanPlain>
-{
-    public ScanPlainValidator()
-    {
-        RuleFor(x => x.Value).NotEmpty();
-    }
-}
-
-internal sealed class ScanRequestValidator : RequestValidator<ScanRequest>
-{
-    public ScanRequestValidator()
-    {
-        RuleFor(x => x.Name).NotEmpty();
-    }
-}
-
-internal sealed class ScanEntityValidator : FeatureValidator<ScanEntity>
-{
-    public ScanEntityValidator()
-    {
-        RuleFor(x => x.Status).NotEmpty();
     }
 }

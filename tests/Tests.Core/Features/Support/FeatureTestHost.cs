@@ -11,7 +11,9 @@ namespace Aurore.Foundation.Tests.Core.Features.Support;
 /// </summary>
 public static class FeatureTestHost
 {
-    public static ServiceProvider Provider(Action<FeaturesBuilder>? configure = null, Action<IServiceCollection>? register = null)
+    public static ServiceProvider Provider(
+        Action<FeaturesBuilder>? configure = null,
+        Action<IServiceCollection>? register = null)
     {
         var services = new ServiceCollection()
             .AddLogging()

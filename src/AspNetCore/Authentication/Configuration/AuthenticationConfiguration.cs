@@ -27,7 +27,10 @@ public static class AuthenticationConfiguration
     /// <param name="identityProvider">The identity provider that issues the tokens: authority, audience, provider kind and clock skew.</param>
     /// <param name="apiKeys">The API key clients. With none configured the API key scheme is not added.</param>
     /// <returns>The same service collection, for chaining.</returns>
-    public static IServiceCollection AddStandardAuthConfiguration(this IServiceCollection services, IdentityProviderOptions identityProvider, ApiKeysOptions apiKeys)
+    public static IServiceCollection AddStandardAuthConfiguration(
+        this IServiceCollection services,
+        IdentityProviderOptions identityProvider,
+        ApiKeysOptions apiKeys)
     {
         var useApiKeys = apiKeys.Clients.Count > 0;
         var defaultScheme = useApiKeys ? AuthenticationDefaults.BearerOrApiKeyScheme : JwtBearerDefaults.AuthenticationScheme;
@@ -80,7 +83,9 @@ public static class AuthenticationConfiguration
     /// <param name="builder">The authentication builder.</param>
     /// <param name="apiKeys">The header to read the key from and the clients the keys belong to.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static AuthenticationBuilder AddStandardApiKeyAuthentication(this AuthenticationBuilder builder, ApiKeysOptions apiKeys)
+    public static AuthenticationBuilder AddStandardApiKeyAuthentication(
+        this AuthenticationBuilder builder,
+        ApiKeysOptions apiKeys)
     {
         return builder.AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyDefaults.AuthenticationScheme, options =>
         {

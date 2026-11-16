@@ -107,7 +107,10 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
     /// A container with the DbContext of the foundation (interceptors included) on this database, a time that tests can
     /// move, and the sample features. Dispose it when done.
     /// </summary>
-    public ServiceProvider Provider(Action<FeaturesBuilder>? features = null, Action<IServiceCollection>? register = null, FakeTimeProvider? time = null)
+    public ServiceProvider Provider(
+        Action<FeaturesBuilder>? features = null,
+        Action<IServiceCollection>? register = null,
+        FakeTimeProvider? time = null)
     {
         var services = new ServiceCollection()
             .AddLogging()

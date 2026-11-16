@@ -15,7 +15,9 @@ public sealed record CreatePersonRequest(string Name, string Email);
 /// </summary>
 public sealed class CreatePerson(TestDbContext db) : Feature<CreatePersonRequest, Guid>
 {
-    protected override async ValueTask<Result<Guid>> ExecuteAsync(CreatePersonRequest request, CancellationToken cancellationToken)
+    protected override async ValueTask<Result<Guid>> ExecuteAsync(
+        CreatePersonRequest request,
+        CancellationToken cancellationToken)
     {
         var person = new Person { Name = request.Name, Email = request.Email };
 
@@ -33,7 +35,9 @@ public sealed class CreatePerson(TestDbContext db) : Feature<CreatePersonRequest
 [WithUniqueViolation]
 public sealed class CreatePersonMarked(TestDbContext db) : Feature<CreatePersonRequest, Guid>
 {
-    protected override async ValueTask<Result<Guid>> ExecuteAsync(CreatePersonRequest request, CancellationToken cancellationToken)
+    protected override async ValueTask<Result<Guid>> ExecuteAsync(
+        CreatePersonRequest request,
+        CancellationToken cancellationToken)
     {
         var person = new Person { Name = request.Name, Email = request.Email };
 
