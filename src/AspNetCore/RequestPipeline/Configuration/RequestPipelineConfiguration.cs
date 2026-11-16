@@ -118,14 +118,10 @@ public static class RequestPipelineConfiguration
             o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
 
             foreach (var proxy in proxies)
-            {
                 o.KnownProxies.Add(proxy);
-            }
 
             foreach (var network in networks)
-            {
                 o.KnownIPNetworks.Add(network);
-            }
         });
     }
 
@@ -153,9 +149,7 @@ public static class RequestPipelineConfiguration
             o.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(options.DefaultSeconds) };
 
             foreach (var (name, seconds) in options.Policies)
-            {
                 o.AddPolicy(name, TimeSpan.FromSeconds(seconds));
-            }
         });
     }
 
@@ -203,9 +197,7 @@ public static class RequestPipelineConfiguration
                         .SetVaryByQuery(policy.VaryByQuery);
 
                     if (policy.VaryByHeader.Length > 0)
-                    {
                         builder.SetVaryByHeader(policy.VaryByHeader);
-                    }
                 });
             }
         });
@@ -237,9 +229,7 @@ public static class RequestPipelineConfiguration
         var isProduction = builder.ApplicationServices.GetRequiredService<IHostEnvironment>().IsProduction();
 
         if (isProduction)
-        {
             builder.UseHsts();
-        }
 
         var effectiveOptions = isProduction ? options : options with { ContentSecurityPolicy = null };
 
@@ -249,9 +239,7 @@ public static class RequestPipelineConfiguration
     private static async ValueTask WriteRateLimitedResponseAsync(OnRejectedContext context, CancellationToken cancellationToken)
     {
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-        {
             context.HttpContext.Response.Headers.RetryAfter = ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString(CultureInfo.InvariantCulture);
-        }
 
         await TypedResults
             .Problem(statusCode: StatusCodes.Status429TooManyRequests, title: "Too Many Requests", detail: "Too many requests. Retry later.")

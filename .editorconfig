@@ -79,7 +79,8 @@ dotnet_sort_system_directives_first = true
 csharp_style_expression_bodied_methods = false
 csharp_style_expression_bodied_constructors = false
 
-# Single-line statements may omit braces; multi-line statements require them
+# No braces around a single line (if, else, foreach, while); braces when the body spans lines. IDE0011 only asks for missing braces:
+# it does not remove redundant ones, so leave them out when writing, and keep them on every branch of an if/else chain that has a braced branch.
 csharp_prefer_braces = when_multiline
 
 csharp_style_var_when_type_is_apparent = true

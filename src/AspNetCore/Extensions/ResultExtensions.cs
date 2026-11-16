@@ -56,9 +56,7 @@ public static class ResultExtensions
         var extensions = new Dictionary<string, object?> { ["code"] = error.Code };
 
         if (error.Details.Count > 0)
-        {
             extensions["errors"] = error.Details;
-        }
 
         return TypedResults.Problem(detail: error.Message, statusCode: ToStatusCode(error.Kind), extensions: extensions);
     }

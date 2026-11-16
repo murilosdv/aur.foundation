@@ -29,10 +29,15 @@ public sealed class ApiKeysOptionsValidator : AbstractValidator<ApiKeysOptions>
         {
             foreach (var (name, client) in clients)
             {
-                if (client.Key.HasValue() is false)
-                    context.AddFailure($"Clients:{name}:Key", $"API key client '{name}' has an empty Key.");
-                else if (isProduction && client.Key.Length < MinimumProductionKeyLength)
-                    context.AddFailure($"Clients:{name}:Key", $"Production API keys must be at least {MinimumProductionKeyLength} characters. Supply them through environment variables or a secret store.");
+                switch (client.Key)
+                {
+                    case var key when key.HasValue() is false:
+                        context.AddFailure($"Clients:{name}:Key", $"API key client '{name}' has an empty Key.");
+                        break;
+                    case { Length: < MinimumProductionKeyLength } when isProduction:
+                        context.AddFailure($"Clients:{name}:Key", $"Production API keys must be at least {MinimumProductionKeyLength} characters. Supply them through environment variables or a secret store.");
+                        break;
+                }
             }
 
             var shared = clients

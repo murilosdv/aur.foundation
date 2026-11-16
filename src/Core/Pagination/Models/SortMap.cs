@@ -136,7 +136,7 @@ public sealed class SortMap<T>
 
         if (_id.Value is { } id)
             steps.Add(new SortStep<T>(new SortItem(SortMap.IdName, SortDirection.Asc), id));
-        else if (steps.Count == 0)
+        else if (steps.Count is 0)
             throw new InvalidOperationException($"{typeof(T).Name} has no 'Id' property, so it needs a SortMap with a default: DefaultTo(x => x.Something).");
 
         return steps;
@@ -145,7 +145,7 @@ public sealed class SortMap<T>
     internal static IQueryable<T> Apply(IQueryable<T> query, IReadOnlyList<SortStep<T>> steps)
     {
         for (var index = 0; index < steps.Count; index++)
-            query = steps[index].Field.Order(query, steps[index].Item.Direction, index == 0);
+            query = steps[index].Field.Order(query, steps[index].Item.Direction, index is 0);
 
         return query;
     }

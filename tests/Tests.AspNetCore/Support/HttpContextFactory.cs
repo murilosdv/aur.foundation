@@ -34,9 +34,7 @@ internal static class HttpContextFactory
         http.Response.Body = new MemoryStream();
 
         if (user is not null)
-        {
             http.User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, user)], "test"));
-        }
 
         return http;
     }

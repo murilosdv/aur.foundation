@@ -37,12 +37,18 @@ public sealed partial class LoggingDecorator(ILogger<LoggingDecorator> logger) :
 
         var elapsed = (long)Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
-        if (result.IsSuccess)
-            LogSucceeded(context.FeatureName, elapsed);
-        else if (result.Error!.Kind is ErrorKind.Failure or ErrorKind.Unavailable)
-            LogFailedOnOurSide(context.FeatureName, result.Error.Code, elapsed);
-        else
-            LogFailed(context.FeatureName, result.Error.Code, elapsed);
+        switch (result)
+        {
+            case { Error: null }:
+                LogSucceeded(context.FeatureName, elapsed);
+                break;
+            case { Error.Kind: ErrorKind.Failure or ErrorKind.Unavailable }:
+                LogFailedOnOurSide(context.FeatureName, result.Error.Code, elapsed);
+                break;
+            default:
+                LogFailed(context.FeatureName, result.Error.Code, elapsed);
+                break;
+        }
 
         return result;
     }

@@ -119,7 +119,7 @@ A minimal `appsettings.json` for the program above:
     "Description": "Issues and tracks invoices.",
     "Maintainer": { "Name": "billing-team", "Email": "billing@example.com" }
   },
-  "IdentityProvider": { "AuthorityUrl": "http://auth.localhost:9999/realms/acme", "Audience": "api", "RequireHttpsMetadata": false },
+  "IdentityProvider": { "AuthorityUrl": "http://127.0.0.1:8080/realms/acme", "Audience": "api", "RequireHttpsMetadata": false },
   "Telemetry": { "Otlp": { "Endpoint": "http://localhost:4317", "Protocol": "Grpc" } },
   "Postgres": { "Host": "127.0.0.1", "Database": "invoices", "Username": "postgres", "Password": "postgres" }
 }

@@ -46,7 +46,7 @@ internal static class RequestValidationFilter
             targets.Add((index, _validateMethod.MakeGenericMethod(type).CreateDelegate<ValidateArgument>()));
         }
 
-        if (targets.Count == 0)
+        if (targets.Count is 0)
             return next;
 
         return async context =>

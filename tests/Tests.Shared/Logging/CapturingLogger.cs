@@ -26,9 +26,7 @@ public sealed class CapturingLogger<T> : ILogger<T>
         if (state is IEnumerable<KeyValuePair<string, object?>> pairs)
         {
             foreach (var (key, value) in pairs)
-            {
                 Scope[key] = value;
-            }
         }
 
         return null;

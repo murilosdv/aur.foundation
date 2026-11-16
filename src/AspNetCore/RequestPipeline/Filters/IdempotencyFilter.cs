@@ -101,9 +101,7 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
     private static IdempotencyCacheEntry? Capture(HttpContext http, object? result, Dictionary<string, string> headersBefore)
     {
         while (result is INestedHttpResult nested)
-        {
             result = nested.Result;
-        }
 
         // A handler may return a plain object (written as 200 JSON); a string is written as text, which a JSON replay would change.
         int? statusCode = result switch
@@ -134,9 +132,7 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
             .ToDictionary(x => x.Key, x => x.Value.Select(v => v ?? string.Empty).ToArray());
 
         if (result?.GetType().GetProperty("Location")?.GetValue(result) is string location)
-        {
             headers["Location"] = [location];
-        }
 
         return new IdempotencyCacheEntry(status, body, headers);
     }
@@ -157,9 +153,7 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
             httpContext.Response.StatusCode = entry.StatusCode;
 
             foreach (var (name, values) in entry.Headers)
-            {
                 httpContext.Response.Headers[name] = values;
-            }
 
             httpContext.Response.Headers[CustomHeaderNames.IdempotencyReplayed] = "true";
 

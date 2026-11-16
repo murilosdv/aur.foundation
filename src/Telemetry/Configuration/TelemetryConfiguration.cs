@@ -200,7 +200,7 @@ public static class TelemetryConfiguration
     /// </summary>
     internal static Uri BuildOtlpEndpoint(string collectorEndpoint, OtlpExportProtocol protocol, string signal)
     {
-        return protocol == OtlpExportProtocol.HttpProtobuf
+        return protocol is OtlpExportProtocol.HttpProtobuf
             ? new Uri($"{collectorEndpoint.TrimEnd('/')}/v1/{signal}")
             : new Uri(collectorEndpoint);
     }

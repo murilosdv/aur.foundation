@@ -39,8 +39,6 @@ public static class ValidatorConfiguration
         var markerType = marker.MakeGenericType(result.InterfaceType.GetGenericArguments()[0]);
 
         if (markerType.IsAssignableFrom(result.ValidatorType))
-        {
             services.TryAddEnumerable(ServiceDescriptor.Scoped(markerType, result.ValidatorType));
-        }
     }
 }

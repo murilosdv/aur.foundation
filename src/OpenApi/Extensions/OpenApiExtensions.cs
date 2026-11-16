@@ -126,7 +126,7 @@ public static class OpenApiExtensions
             .Concat(metadata.OfType<AuthorizationPolicy>().SelectMany(x => x.AuthenticationSchemes))
             .ToList();
 
-        return pinned.Count == 0 || pinned.Contains(authenticationScheme, StringComparer.OrdinalIgnoreCase);
+        return pinned.Count is 0 || pinned.Contains(authenticationScheme, StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool RequiresAuthorization(ApiDescription description)
@@ -160,7 +160,7 @@ public static class OpenApiExtensions
     /// <returns>The same options, for chaining.</returns>
     public static OpenApiOptions AddStandardApiKeySecurity(this OpenApiOptions options, ApiKeysOptions apiKeys)
     {
-        if (apiKeys.Clients.Count == 0)
+        if (apiKeys.Clients.Count is 0)
             return options;
 
         return options.AddStandardSecuritySchemeAndRequirement(ApiKeyDefaults.AuthenticationScheme, new OpenApiSecurityScheme
@@ -230,7 +230,7 @@ public static class OpenApiExtensions
         {
             foreach (var parameter in operation.Parameters?.OfType<OpenApiParameter>() ?? [])
             {
-                if (parameter.In == ParameterLocation.Query && parameter.Name.HasValue())
+                if (parameter.In is ParameterLocation.Query && parameter.Name.HasValue())
                     parameter.Name = parameter.Name.ToCamelCase();
             }
 
@@ -253,7 +253,7 @@ public static class OpenApiExtensions
 
             operation.Parameters ??= [];
 
-            if (operation.Parameters.All(p => p.Name != CustomHeaderNames.IdempotencyKey))
+            if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.IdempotencyKey))
             {
                 operation.Parameters.Add(new OpenApiParameter
                 {
@@ -292,7 +292,7 @@ public static class OpenApiExtensions
                 {
                     operation.Parameters ??= [];
 
-                    if (operation.Parameters.All(p => p.Name != CustomHeaderNames.CorrelationId))
+                    if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.CorrelationId))
                     {
                         operation.Parameters.Add(new OpenApiParameter
                         {

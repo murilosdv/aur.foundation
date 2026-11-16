@@ -41,10 +41,8 @@ public static class CorsConfiguration
     /// </summary>
     internal static IHostApplicationBuilder AddStandardCorsPolicies(this IHostApplicationBuilder builder, IReadOnlyDictionary<string, CorsPolicyOptions> policies)
     {
-        if (policies.Count == 0)
-        {
+        if (policies.Count is 0)
             return builder;
-        }
 
         ValidatePolicies(policies, builder.Environment.IsProduction());
 
@@ -86,7 +84,7 @@ public static class CorsConfiguration
                 throw new InvalidOperationException($"CORS policy '{name}' cannot allow any origin ('*') in production.");
 
             var invalidOrigin = policy.AllowedOrigins.FirstOrDefault(x =>
-                x != "*" && (!Uri.TryCreate(x, UriKind.Absolute, out var uri) || uri.PathAndQuery != "/" || x.EndsWith('/')));
+                x is not "*" && (!Uri.TryCreate(x, UriKind.Absolute, out var uri) || uri.PathAndQuery is not "/" || x.EndsWith('/')));
 
             if (invalidOrigin is not null)
                 throw new InvalidOperationException($"CORS policy '{name}' has an invalid origin '{invalidOrigin}'. Origins must be scheme + host (+ port) with no path or trailing slash, e.g. 'https://app.example.com'.");
