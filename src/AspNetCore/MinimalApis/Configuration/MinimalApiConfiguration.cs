@@ -88,31 +88,23 @@ public static class MinimalApiConfiguration
             groupBuilder.MapEndpoints(endpoints);
         }
 
-        api.ValidateRouteNames();
+        ValidateUniqueRouteNames(builder);
 
         return builder;
     }
 
-    /// <summary>
-    /// The catalog only knows the names from the Name property; a WithName call inside Map is a convention that ASP.NET applies
-    /// when it builds the endpoints. Building them here, while the application is still starting, makes a duplicate stop the start
-    /// instead of answering 500 on the first request.
-    /// </summary>
-    private static void ValidateRouteNames(this IEndpointRouteBuilder api)
+    private static void ValidateUniqueRouteNames(IEndpointRouteBuilder builder)
     {
-        var duplicate = api.DataSources
-            .SelectMany(x => x.Endpoints)
-            .Select(x => (Endpoint: x, Name: x.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName))
-            .Where(x => x.Name is not null)
-            .GroupBy(x => x.Name, StringComparer.Ordinal)
-            .FirstOrDefault(x => x.Count() > 1);
+        var duplicate = builder.DataSources
+            .SelectMany(source => source.Endpoints)
+            .GroupBy(endpoint => endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName, StringComparer.Ordinal)
+            .FirstOrDefault(group => group.Key is not null && group.Count() > 1);
 
         if (duplicate is null)
             return;
 
-        var names = string.Join(", ", duplicate.Select(x => x.Endpoint.DisplayName));
-
-        throw new InvalidOperationException($"Endpoints [{names}] share the route name '{duplicate.Key}'. Use a different name in WithName or in the Name property.");
+        var endpoints = string.Join(", ", duplicate.Select(endpoint => endpoint.DisplayName));
+        throw new InvalidOperationException($"Endpoints [{endpoints}] share the route name '{duplicate.Key}'. Override Name or use WithName on one of them to make it unique.");
     }
 
     internal static IReadOnlyList<int> ResolveGlobalProblems(IEnumerable<int>? globalProblems)
@@ -172,18 +164,19 @@ public static class MinimalApiConfiguration
                 .Map(builder)
                 .MapToApiVersion(endpoint.Version);
 
-            // Precedence, last wins: derived default < property override < WithName/WithSummary/WithDescription inside Map.
-            // Conventions run in the order they were added, so the ones from Map have already run when these do.
-            route.Add(x =>
+            route.Add(endpointBuilder =>
             {
-                if (x.Metadata.OfType<IEndpointNameMetadata>().Any() is false)
-                    x.Metadata.Add(new EndpointNameMetadata(endpoint.RouteName));
+                if (endpointBuilder.Metadata.OfType<IEndpointNameMetadata>().Any() is false)
+                {
+                    endpointBuilder.Metadata.Add(new EndpointNameMetadata(endpoint.RouteName));
+                    endpointBuilder.Metadata.Add(new RouteNameMetadata(endpoint.RouteName));
+                }
 
-                if (x.Metadata.OfType<IEndpointSummaryMetadata>().Any() is false)
-                    x.Metadata.Add(new EndpointSummaryAttribute(endpoint.Summary));
+                if (endpointBuilder.Metadata.OfType<IEndpointSummaryMetadata>().Any() is false)
+                    endpointBuilder.Metadata.Add(new EndpointSummaryAttribute(endpoint.Summary));
 
-                if (endpoint.Description is { } description && x.Metadata.OfType<IEndpointDescriptionMetadata>().Any() is false)
-                    x.Metadata.Add(new EndpointDescriptionAttribute(description));
+                if (endpoint.Description is { } description && endpointBuilder.Metadata.OfType<IEndpointDescriptionMetadata>().Any() is false)
+                    endpointBuilder.Metadata.Add(new EndpointDescriptionAttribute(description));
             });
         }
     }

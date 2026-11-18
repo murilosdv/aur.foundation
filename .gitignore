@@ -7,6 +7,13 @@
 
 # dotenv files
 .env
+.env.*
+!.env.example
+
+# Local secret files
+secrets.yml
+secrets.yaml
+secrets.json
 
 # User-specific files
 *.rsuser

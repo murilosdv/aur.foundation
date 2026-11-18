@@ -32,7 +32,7 @@ They use real servers because a fake only proves the fake works (SQL translation
 | PostgreSQL | `127.0.0.1:5432` | `postgres` / `postgres` |
 | SQL Server | `127.0.0.1:1433` | `sa` / `SqlServer@123Dev` |
 
-The machine's dev-sbx (`.dev-sbx`, `docker compose up -d`) provides both. Each test class creates its own database and drops it afterwards. `TEST_POSTGRES_HOST` and `TEST_SQLSERVER_HOST` change the host.
+The machine's dev-sbx (`.dev-sbx`) provides both: `make sbx-up` starts it with both databases (`make sbx-up DB=postgres` for one, `make sbx-down` removes its containers). Each test class creates its own database and drops it afterwards. `TEST_POSTGRES_HOST` and `TEST_SQLSERVER_HOST` change the host.
 Without a server the tests fail with a message that says so; they never skip, since a silent skip hides regressions.
 
 Use `127.0.0.1`, not `localhost`: `localhost` resolves to `::1` first, and Docker in WSL does not forward IPv6.
@@ -48,7 +48,7 @@ dotnet test --solution Foundation.slnx --filter-not-trait "Category=Integration"
 make test                                                                         # everything in a Linux container, with coverage
 ```
 
-`make` also has `test-local`, `report` (opens the coverage report) and `clean`. Results go to `artifacts/test-results`, the coverage report to `artifacts/coverage-report/index.html`.
+`make` also has `test-local` (runs `dotnet format` first, then the tests), `report` (opens the coverage report), `clean`, and `sbx-up` / `sbx-down` for the dev-sbx. Results go to `artifacts/test-results`, the coverage report to `artifacts/coverage-report/index.html`.
 The container run matches CI (Linux, Release) and reaches the servers on the `dev-sbx` network as `sbx-postgres` and `sbx-sqlserver`.
 
 ## Coverage

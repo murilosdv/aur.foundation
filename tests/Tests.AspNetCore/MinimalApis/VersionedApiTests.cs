@@ -9,6 +9,8 @@ using Aurore.Foundation.AspNetCore.MinimalApis.Configuration;
 using Aurore.Foundation.Core.Authentication.Models;
 using Aurore.Foundation.Tests.Shared.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +20,7 @@ namespace Aurore.Foundation.Tests.AspNetCore.MinimalApis;
 public sealed class VersionedApiTests : IAsyncLifetime
 {
     private TestApp _app = null!;
+    private Endpoint[] _endpoints = [];
 
     public async ValueTask InitializeAsync()
     {
@@ -31,6 +34,7 @@ public sealed class VersionedApiTests : IAsyncLifetime
             {
                 app.UseAuthentication().UseAuthorization();
                 app.MapStandardMinimalEndpoints(catalog);
+                _endpoints = [.. ((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints)];
             });
     }
 
@@ -90,6 +94,225 @@ public sealed class VersionedApiTests : IAsyncLifetime
         Assert.True(widgets.RequireAuthorization);
     }
 
+    [Fact(DisplayName = "Endpoint metadata uses generated defaults when no properties or conventions are supplied")]
+    public void MetadataUsesGeneratedDefaults()
+    {
+        // Arrange
+        var declaration = new WidgetsV2();
+
+        // Act
+        var endpoint = Assert.Single(_endpoints, endpoint => endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName == declaration.RouteName);
+
+        // Assert
+        Assert.Equal(declaration.Summary, endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary);
+        Assert.Null(endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>());
+        Assert.Equal(declaration.RouteName, endpoint.Metadata.GetMetadata<IRouteNameMetadata>()?.RouteName);
+    }
+
+    [Fact(DisplayName = "Overridden endpoint properties replace generated metadata defaults")]
+    public void MetadataUsesOverriddenProperties()
+    {
+        // Arrange
+        var declaration = new WidgetsV1();
+
+        // Act
+        var endpoint = Assert.Single(_endpoints, endpoint => endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName == declaration.Name);
+
+        // Assert
+        Assert.Equal("Property summary", endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary);
+        Assert.Equal("Property description", endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()?.Description);
+        Assert.Equal(declaration.Name, endpoint.Metadata.GetMetadata<IRouteNameMetadata>()?.RouteName);
+    }
+
+    [Fact(DisplayName = "Explicit endpoint metadata overrides properties and the last convention wins")]
+    public void LastExplicitMetadataWinsOverProperties()
+    {
+        // Arrange & Act
+        var endpoint = Assert.Single(_endpoints, endpoint => endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName == "ExplicitOpenV1");
+
+        // Assert
+        Assert.Equal("Last explicit summary", endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary);
+        Assert.Equal("Last explicit description", endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()?.Description);
+        Assert.Equal("ExplicitOpenV1", endpoint.Metadata.GetMetadata<IRouteNameMetadata>()?.RouteName);
+    }
+
+    [Fact(DisplayName = "Explicit names can resolve duplicate property names during mapping")]
+    public async Task ExplicitNamesResolveDuplicateProperties()
+    {
+        // Arrange
+        var catalog = MinimalEndpointCatalog.Create([typeof(NamingResource), typeof(FirstNamedEndpoint), typeof(SecondNamedEndpoint)]);
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddStandardApiVersioning(catalog);
+        await using var app = builder.Build();
+
+        // Act
+        app.MapStandardMinimalEndpoints(catalog);
+        var names = ((IEndpointRouteBuilder)app).DataSources
+            .SelectMany(source => source.Endpoints)
+            .Select(endpoint => endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName)
+            .ToArray();
+
+        // Assert
+        Assert.Contains("FirstExplicitName", names);
+        Assert.Contains("SecondExplicitName", names);
+        Assert.DoesNotContain("SharedPropertyName", names);
+    }
+
+    [Fact(DisplayName = "Duplicate final explicit endpoint names fail during mapping")]
+    public async Task DuplicateExplicitNamesFailDuringMapping()
+    {
+        // Arrange
+        var catalog = MinimalEndpointCatalog.Create([typeof(NamingResource), typeof(FirstNamedEndpoint), typeof(DuplicateNamedEndpoint)]);
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddStandardApiVersioning(catalog);
+        await using var app = builder.Build();
+
+        // Act
+        var error = Assert.Throws<InvalidOperationException>(() => app.MapStandardMinimalEndpoints(catalog));
+
+        // Assert
+        Assert.Contains("share the route name 'FirstExplicitName'", error.Message);
+    }
+
+    [Fact(DisplayName = "Duplicate final property endpoint names still fail during mapping")]
+    public async Task DuplicatePropertyNamesFailDuringMapping()
+    {
+        // Arrange
+        var catalog = MinimalEndpointCatalog.Create([typeof(NamingResource), typeof(FirstPropertyEndpoint), typeof(SecondPropertyEndpoint)]);
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddStandardApiVersioning(catalog);
+        await using var app = builder.Build();
+
+        // Act
+        var error = Assert.Throws<InvalidOperationException>(() => app.MapStandardMinimalEndpoints(catalog));
+
+        // Assert
+        Assert.Contains("share the route name 'SharedPropertyName'", error.Message);
+    }
+
+    [Fact(DisplayName = "Group metadata supplies defaults but explicit endpoint metadata still wins")]
+    public async Task EndpointMetadataWinsOverGroupMetadata()
+    {
+        // Arrange
+        var catalog = MinimalEndpointCatalog.Create([typeof(NamingResource), typeof(FirstNamedEndpoint)]);
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddStandardApiVersioning(catalog);
+        await using var app = builder.Build();
+
+        // Act
+        app.MapStandardMinimalEndpoints(catalog, group => group
+            .WithName("GroupName")
+            .WithSummary("Group summary")
+            .WithDescription("Group description"));
+        var endpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints));
+
+        // Assert
+        Assert.Equal("FirstExplicitName", endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName);
+        Assert.Equal("Group summary", endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary);
+        Assert.Equal("Group description", endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()?.Description);
+    }
+
+    [Fact(DisplayName = "Late endpoint conventions override fallback metadata")]
+    public async Task FinalConventionsOverrideFallbackMetadata()
+    {
+        // Arrange
+        var catalog = MinimalEndpointCatalog.Create([typeof(NamingResource), typeof(FinalMetadataEndpoint)]);
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddStandardApiVersioning(catalog);
+        await using var app = builder.Build();
+
+        // Act
+        app.MapStandardMinimalEndpoints(catalog);
+        var endpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints));
+
+        // Assert
+        Assert.Equal("FinalName", endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName);
+        Assert.Equal("FinalName", endpoint.Metadata.GetMetadata<IRouteNameMetadata>()?.RouteName);
+        Assert.Equal("Final summary", endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary);
+        Assert.Equal("Final description", endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()?.Description);
+    }
+
+    private sealed class FinalMetadataEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override string Name => "PropertyName";
+
+        public override string Summary => "Property summary";
+
+        public override string Description => "Property description";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            var route = builder.MapGet("final", () => "final");
+            route.Finally(endpoint =>
+            {
+                endpoint.Metadata.Add(new EndpointNameMetadata("FinalName"));
+                endpoint.Metadata.Add(new RouteNameMetadata("FinalName"));
+                endpoint.Metadata.Add(new EndpointSummaryAttribute("Final summary"));
+                endpoint.Metadata.Add(new EndpointDescriptionAttribute("Final description"));
+            });
+            return route;
+        }
+    }
+
+    private sealed class NamingResource : ResourceGroup
+    {
+        public override bool RequireAuthorization => false;
+    }
+
+    private sealed class FirstNamedEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override string Name => "SharedPropertyName";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("first", () => "first").WithName("FirstExplicitName");
+        }
+    }
+
+    private sealed class SecondNamedEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override string Name => "SharedPropertyName";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("second", () => "second").WithName("SecondExplicitName");
+        }
+    }
+
+    private sealed class DuplicateNamedEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            var route = builder.MapGet("duplicate", () => "duplicate").WithName("InitiallyUniqueName");
+            route.Finally(endpoint =>
+            {
+                endpoint.Metadata.Add(new EndpointNameMetadata("FirstExplicitName"));
+                endpoint.Metadata.Add(new RouteNameMetadata("FirstExplicitName"));
+            });
+            return route;
+        }
+    }
+
+    private sealed class FirstPropertyEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override string Name => "SharedPropertyName";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("first", () => "first");
+        }
+    }
+
+    private sealed class SecondPropertyEndpoint : MinimalEndpoint<NamingResource>
+    {
+        public override string Name => "SharedPropertyName";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("second", () => "second");
+        }
+    }
+
     private sealed class WidgetsResource : ResourceGroup
     {
         public override MinimalEndpointVersion[] Versions => [1, new(2, true, new DateOnly(2031, 1, 1))];
@@ -97,6 +320,12 @@ public sealed class VersionedApiTests : IAsyncLifetime
 
     private sealed class WidgetsV1 : MinimalEndpoint<WidgetsResource>
     {
+        public override string Name => "PropertyWidgetsV1";
+
+        public override string Summary => "Property summary";
+
+        public override string Description => "Property description";
+
         public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
         {
             return builder.MapGet("list", () => "widgets");
@@ -109,7 +338,9 @@ public sealed class VersionedApiTests : IAsyncLifetime
 
         public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
         {
-            return builder.MapGet("list", () => "widgets");
+            return builder.MapGet("list", Handle);
+
+            static string Handle() => "widgets";
         }
     }
 
@@ -122,9 +353,21 @@ public sealed class VersionedApiTests : IAsyncLifetime
 
     private sealed class OpenV1 : MinimalEndpoint<OpenResource>
     {
+        public override string Name => "PropertyOpenV1";
+
+        public override string Summary => "Property summary";
+
+        public override string Description => "Property description";
+
         public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
         {
-            return builder.MapGet("list", () => "open");
+            return builder.MapGet("list", () => "open")
+                .WithName("FirstExplicitOpenV1")
+                .WithSummary("First explicit summary")
+                .WithDescription("First explicit description")
+                .WithName("ExplicitOpenV1")
+                .WithSummary("Last explicit summary")
+                .WithDescription("Last explicit description");
         }
     }
 

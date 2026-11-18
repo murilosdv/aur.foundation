@@ -104,13 +104,21 @@ user.HasScope("api.read");
 
 ## Pinning a scheme
 
-By default an endpoint accepts both. To accept only one:
+When both schemes are registered, the default accepts either kind of caller. To select one, import `Aurore.Foundation.AspNetCore.Authentication.Extensions` and use the same helpers on an endpoint or a resource group:
 
 ```csharp
-endpoint.RequireAuthorization(policy => policy
-    .AddAuthenticationSchemes(ApiKeyDefaults.AuthenticationScheme)      // or JwtBearerDefaults.AuthenticationScheme
-    .RequireAuthenticatedUser());
+group.RequireJwtBearerAuthentication().RequireRoles("admin");
 ```
+
+For a separate API-key-only endpoint or group:
+
+```csharp
+endpoint.RequireApiKeyAuthentication().RequireRoles("reader");
+```
+
+Both helpers require an authenticated caller and return the same builder, so they chain with the existing role/scope helpers. They select schemes; they do not register them. API-key selection requires a registered API-key scheme, normally enabled by configuring at least one API-key client.
+
+Use only one scheme-selection helper across a route's group/endpoint policy chain. ASP.NET Core combines explicitly listed schemes as alternatives: adding both helpers does not require two credentials or narrow one selected scheme to another. For the configured default behavior, use `RequireAuthorization()` without selecting schemes. `AllowAnonymous()` still explicitly bypasses authorization.
 
 The OpenAPI document follows ([OpenAPI](../openapi/README.md)): an endpoint pinned to the API key lists only the API key, one pinned to bearer lists the token schemes, and one that pins nothing lists all of them.
 

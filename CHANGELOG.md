@@ -8,10 +8,15 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ## [AspNetCore-1.0.0-preview.2] - 2026-11-18
 
+### Added
+
+- `RequireJwtBearerAuthentication()` and `RequireApiKeyAuthentication()` select one registered authentication scheme on an endpoint or a resource group, and compose with the role and scope helpers.
+
 ### Fixed
 
 - The route name, summary and description of a minimal endpoint now follow one order, the last one wins: the derived default, then the `Name`, `Summary` and `Description` properties, then `WithName`, `WithSummary` and `WithDescription` inside `Map`. Before, the property or the derived value always overwrote the calls made in `Map`.
-- Two endpoints with the same name, set with `WithName` or the `Name` property, stop the application from starting. A `WithName` duplicate used to start fine and answer 500 on the first request.
+- Two endpoints with the same final name, set with `WithName` or the `Name` property, stop the application from starting. A `WithName` duplicate used to start fine and answer 500 on the first request, and a repeated `Name` property was rejected even when `WithName` made the names unique.
+- Endpoints named by default or by the `Name` property now also carry the route name metadata, so link generation finds them.
 
 ### Changed
 

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Aurore.Foundation.AspNetCore.Authentication.Constants;
 using Aurore.Foundation.AspNetCore.Authentication.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -16,6 +18,32 @@ namespace Aurore.Foundation.Tests.AspNetCore.Authentication.Extensions;
 public sealed class EndpointAuthorizationExtensionsTests
 {
     private static readonly string[] _required = ["first", "second"];
+
+    public static TheoryData<string, string> AuthenticationCases => new()
+    {
+        { nameof(EndpointAuthorizationExtensions.RequireJwtBearerAuthentication), JwtBearerDefaults.AuthenticationScheme },
+        { nameof(EndpointAuthorizationExtensions.RequireApiKeyAuthentication), ApiKeyDefaults.AuthenticationScheme },
+    };
+
+    [Theory(DisplayName = "Authentication helpers select only their scheme and reject anonymous callers")]
+    [MemberData(nameof(AuthenticationCases))]
+    public async Task AuthenticationHelpersSelectScheme(string method, string scheme)
+    {
+        var builder = new RecordingBuilder();
+        var result = method is nameof(EndpointAuthorizationExtensions.RequireJwtBearerAuthentication)
+            ? builder.RequireJwtBearerAuthentication() : builder.RequireApiKeyAuthentication();
+        var endpoint = new RouteEndpointBuilder(_ => Task.CompletedTask, RoutePatternFactory.Parse("/"), 0);
+        builder.Apply(endpoint);
+
+        var policy = Assert.Single(endpoint.Metadata.OfType<AuthorizationPolicy>());
+        using var provider = new ServiceCollection().AddLogging().AddAuthorization().BuildServiceProvider();
+        var authorization = provider.GetRequiredService<IAuthorizationService>();
+        var anonymous = await authorization.AuthorizeAsync(new ClaimsPrincipal(new ClaimsIdentity()), policy);
+
+        Assert.Same(builder, result);
+        Assert.Equal([scheme], policy.AuthenticationSchemes);
+        Assert.False(anonymous.Succeeded);
+    }
 
     public static TheoryData<string, string[], bool> RoleCases => new()
     {
