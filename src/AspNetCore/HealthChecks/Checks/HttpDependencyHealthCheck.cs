@@ -10,7 +10,10 @@ namespace Aurore.Foundation.AspNetCore.HealthChecks.Checks;
 /// <summary>
 /// Calls an upstream HTTP service and reports whether it answered with a success status.
 /// </summary>
-internal sealed class HttpDependencyHealthCheck(ILogger<HttpDependencyHealthCheck> logger, IHttpClientFactory clientFactory) : IHealthCheck
+internal sealed class HttpDependencyHealthCheck(
+    ILogger<HttpDependencyHealthCheck> logger,
+    IHttpClientFactory clientFactory)
+    : IHealthCheck
 {
     private const string ClientNamePrefix = "health-check-";
 
@@ -31,7 +34,9 @@ internal sealed class HttpDependencyHealthCheck(ILogger<HttpDependencyHealthChec
     /// <param name="context">The health check registration being run.</param>
     /// <param name="cancellationToken">A token to cancel the check.</param>
     /// <returns>Healthy when the dependency answers with a success status; otherwise the failure status of the registration.</returns>
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
     {
         var name = context.Registration.Name;
         var failureStatus = context.Registration.FailureStatus;

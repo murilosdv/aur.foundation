@@ -7,6 +7,7 @@ using Aurore.Foundation.AspNetCore.RequestPipeline.Filters;
 using Aurore.Foundation.Core.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 
@@ -87,7 +88,31 @@ public static class MinimalApiConfiguration
             groupBuilder.MapEndpoints(endpoints);
         }
 
+        api.ValidateRouteNames();
+
         return builder;
+    }
+
+    /// <summary>
+    /// The catalog only knows the names from the Name property; a WithName call inside Map is a convention that ASP.NET applies
+    /// when it builds the endpoints. Building them here, while the application is still starting, makes a duplicate stop the start
+    /// instead of answering 500 on the first request.
+    /// </summary>
+    private static void ValidateRouteNames(this IEndpointRouteBuilder api)
+    {
+        var duplicate = api.DataSources
+            .SelectMany(x => x.Endpoints)
+            .Select(x => (Endpoint: x, Name: x.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName))
+            .Where(x => x.Name is not null)
+            .GroupBy(x => x.Name, StringComparer.Ordinal)
+            .FirstOrDefault(x => x.Count() > 1);
+
+        if (duplicate is null)
+            return;
+
+        var names = string.Join(", ", duplicate.Select(x => x.Endpoint.DisplayName));
+
+        throw new InvalidOperationException($"Endpoints [{names}] share the route name '{duplicate.Key}'. Use a different name in WithName or in the Name property.");
     }
 
     internal static IReadOnlyList<int> ResolveGlobalProblems(IEnumerable<int>? globalProblems)
@@ -103,7 +128,10 @@ public static class MinimalApiConfiguration
         return custom;
     }
 
-    private static RouteGroupBuilder ConfigureProblems(this RouteGroupBuilder builder, ResourceGroup group, IReadOnlyList<int> globalProblems)
+    private static RouteGroupBuilder ConfigureProblems(
+        this RouteGroupBuilder builder,
+        ResourceGroup group,
+        IReadOnlyList<int> globalProblems)
     {
         foreach (var problem in group.Problems.Except(globalProblems))
             builder.ProducesProblem(problem);
@@ -142,12 +170,21 @@ public static class MinimalApiConfiguration
         {
             var route = endpoint
                 .Map(builder)
-                .WithName(endpoint.RouteName)
-                .WithSummary(endpoint.Summary)
                 .MapToApiVersion(endpoint.Version);
 
-            if (endpoint.Description is { } description)
-                route.WithDescription(description);
+            // Precedence, last wins: derived default < property override < WithName/WithSummary/WithDescription inside Map.
+            // Conventions run in the order they were added, so the ones from Map have already run when these do.
+            route.Add(x =>
+            {
+                if (x.Metadata.OfType<IEndpointNameMetadata>().Any() is false)
+                    x.Metadata.Add(new EndpointNameMetadata(endpoint.RouteName));
+
+                if (x.Metadata.OfType<IEndpointSummaryMetadata>().Any() is false)
+                    x.Metadata.Add(new EndpointSummaryAttribute(endpoint.Summary));
+
+                if (endpoint.Description is { } description && x.Metadata.OfType<IEndpointDescriptionMetadata>().Any() is false)
+                    x.Metadata.Add(new EndpointDescriptionAttribute(description));
+            });
         }
     }
 }

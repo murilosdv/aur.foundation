@@ -23,7 +23,9 @@ public static class ScalarExtensions
     /// <param name="builder">The host builder.</param>
     /// <param name="versions">The API versions, in the order the documents are listed.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static IHostApplicationBuilder ConfigureStandardScalarDocuments(this IHostApplicationBuilder builder, IEnumerable<MinimalEndpointVersion> versions)
+    public static IHostApplicationBuilder ConfigureStandardScalarDocuments(
+        this IHostApplicationBuilder builder,
+        IEnumerable<MinimalEndpointVersion> versions)
     {
         var documents = versions
             .Select(v => new ScalarDocument(OpenApiExtensions.DocumentName(v.Number), v switch
@@ -46,7 +48,10 @@ public static class ScalarExtensions
     /// <param name="identityProvider">The identity provider the sign-in goes to.</param>
     /// <param name="apiDocs">The client id registered for the documentation.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static ScalarOptions WithStandardAuthentication(this ScalarOptions options, IdentityProviderOptions identityProvider, ApiDocsOptions apiDocs)
+    public static ScalarOptions WithStandardAuthentication(
+        this ScalarOptions options,
+        IdentityProviderOptions identityProvider,
+        ApiDocsOptions apiDocs)
     {
         if (apiDocs.OAuthClientId.HasValue() is false)
             return options;

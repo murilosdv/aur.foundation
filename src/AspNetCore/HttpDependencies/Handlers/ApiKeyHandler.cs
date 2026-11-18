@@ -13,7 +13,9 @@ internal sealed class ApiKeyHandler(UpstreamApiKeyOptions options) : DelegatingH
     /// <summary>
     /// Adds the configured header before sending the request.
     /// </summary>
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
         request.Headers.Remove(options.HeaderName);
         request.Headers.TryAddWithoutValidation(options.HeaderName, options.Value);

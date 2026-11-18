@@ -22,7 +22,7 @@ internal static class UniqueViolationErrors
                 fields.Add(property.Name.ToCamelCase());
         }
 
-        return fields.Count == 0
+        return fields.Count is 0
             ? DatabaseErrors.Conflict
             : DatabaseErrors.Conflict.WithDetails(fields.ToDictionary(field => field, _ => new[] { "A record with this value already exists." }));
     }

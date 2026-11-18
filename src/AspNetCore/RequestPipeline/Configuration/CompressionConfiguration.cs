@@ -13,7 +13,9 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Configuration;
 /// </summary>
 public static class CompressionConfiguration
 {
-    internal static IServiceCollection AddStandardResponseCompression(this IServiceCollection services, ResponseCompressionConfigurationOptions options)
+    internal static IServiceCollection AddStandardResponseCompression(
+        this IServiceCollection services,
+        ResponseCompressionConfigurationOptions options)
     {
         if (options.Enabled is false)
             return services;
@@ -36,7 +38,9 @@ public static class CompressionConfiguration
     /// Pairs with AddStandardResponseCompression: when compression is disabled its services aren't registered,
     /// and the framework's UseResponseCompression() would fail to start.
     /// </summary>
-    internal static IApplicationBuilder UseStandardResponseCompression(this IApplicationBuilder builder, ResponseCompressionConfigurationOptions options)
+    internal static IApplicationBuilder UseStandardResponseCompression(
+        this IApplicationBuilder builder,
+        ResponseCompressionConfigurationOptions options)
     {
         return options.Enabled ? builder.UseResponseCompression() : builder;
     }

@@ -20,8 +20,6 @@ internal sealed class PrivacyActivityProcessor(IPrivacyProtector privacy) : Base
         List<KeyValuePair<string, object?>> protectedTags = [.. data.TagObjects.Where(x => x.Value is string && privacy.IsProtected(x.Key))];
 
         foreach (var (key, value) in protectedTags)
-        {
             data.SetTag(key, privacy.Protect(key, (string)value!));
-        }
     }
 }

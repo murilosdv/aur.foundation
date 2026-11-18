@@ -66,9 +66,26 @@ internal sealed class GetPostEndpoint : MinimalEndpoint<PostsResource>
 | `Summary` | class name without `Endpoint`, in title case | The short title in the API document. |
 | `Description` | none | A longer description in the API document. |
 | `Name` | derived from `Summary` (PascalCase) | The route name. Unique across the app; identifies the endpoint for link generation and in the documents. |
+
+`WithName`, `WithSummary` and `WithDescription` called in `Map` take precedence over these three ([below](#name-summary-and-description-the-last-one-wins)).
+
 | `Map(builder)` | required | Declares the route and handler on the group and returns the `RouteHandlerBuilder` so you can chain conventions. |
 
 No registration is needed: the class existing is the registration.
+
+### Name, summary and description: the last one wins
+
+The route name, the summary and the description can come from three places. Each one replaces the one before it:
+
+| Order | Source | Example |
+|---|---|---|
+| 1 | The derived default | `GetPostEndpoint` → summary `Get Post`, name `GetPost` |
+| 2 | The property override | `public override string Summary => "Gets a post";` |
+| 3 | The call inside `Map` | `.WithName("GetPostBySlug")`, `.WithSummary(…)`, `.WithDescription(…)` |
+
+Nothing set means the default. A property replaces the default. `WithName`, `WithSummary` or `WithDescription` in `Map` replace both, whatever the property says. The description has no default, so it is only present when set at level 2 or 3.
+
+Route names must stay unique whichever level sets them. The catalog checks the `Name` property while it is built; a name set with `WithName` only exists once ASP.NET builds the endpoints, so `MapStandardMinimalEndpoints` builds the endpoints and checks them before it returns, and the application does not start.
 
 ## Conventions stack
 
@@ -122,7 +139,7 @@ Add it to the group's `Versions` (mark the old one deprecated), then create endp
 
 The application **fails to start** when:
 
-- group names or route names repeat;
+- group names or route names repeat (route names set with `WithName` too, checked when the endpoints are mapped);
 - a group has no versions, a version is zero or a version repeats;
 - an endpoint targets a version its group does not declare;
 - a declared version has no endpoint;

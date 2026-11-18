@@ -20,7 +20,9 @@ public static class FluentValidationExtensions
     /// <param name="failures">The failures reported by the validators.</param>
     /// <param name="error">The error that defines code, message and kind. Defaults to the standard validation error.</param>
     /// <returns>The error carrying the messages grouped by field.</returns>
-    public static ApplicationError ToApplicationError(this IEnumerable<ValidationFailure> failures, ApplicationError? error = null)
+    public static ApplicationError ToApplicationError(
+        this IEnumerable<ValidationFailure> failures,
+        ApplicationError? error = null)
     {
         var details = failures
             .GroupBy(x => ToFieldPath(x.PropertyName))

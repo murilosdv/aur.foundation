@@ -25,7 +25,10 @@ public sealed class SoftDeleteInterceptor(TimeProvider timeProvider) : SaveChang
     }
 
     /// <inheritdoc />
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
         MarkDeleted(eventData.Context);
 

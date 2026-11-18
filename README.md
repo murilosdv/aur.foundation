@@ -28,6 +28,7 @@ New here? [Getting started](./docs/getting-started.md) wires a whole service and
 - Expected failures are returned as results, never thrown ([results and errors](./docs/core/results-and-errors.md)).
 - Everything public has [XML documentation](./docs/instructions/xml-docs.md); a missing one fails the build.
 - Tests cover our own logic only. See [Testing](./docs/instructions/testing.md).
+- Files, pattern matching, braces and long declarations follow the [code style](./docs/instructions/code-style.md).
 
 ## Documentation
 

@@ -142,7 +142,9 @@ public sealed class CorsConfigurationTests
         Assert.False(without.Headers.Contains("Access-Control-Allow-Origin"));
     }
 
-    private static Task<TestApp> StartAsync(IReadOnlyDictionary<string, CorsPolicyOptions> policies, Action<WebApplication>? map = null)
+    private static Task<TestApp> StartAsync(
+        IReadOnlyDictionary<string, CorsPolicyOptions> policies,
+        Action<WebApplication>? map = null)
     {
         return TestApp.StartAsync(
             builder => builder.AddStandardCorsPolicies(policies),

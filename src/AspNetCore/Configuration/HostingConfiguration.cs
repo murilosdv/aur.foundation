@@ -18,7 +18,9 @@ public static class HostingConfiguration
     /// <param name="options">The hosting settings.</param>
     /// <returns>The same builder, for chaining.</returns>
     [ExcludeFromCodeCoverage]
-    public static IHostApplicationBuilder ConfigureStandardHosting(this IHostApplicationBuilder builder, HostingOptions options)
+    public static IHostApplicationBuilder ConfigureStandardHosting(
+        this IHostApplicationBuilder builder,
+        HostingOptions options)
     {
         builder.Services.Configure<HostOptions>(o => o.ShutdownTimeout = TimeSpan.FromSeconds(options.ShutdownTimeoutSeconds));
 

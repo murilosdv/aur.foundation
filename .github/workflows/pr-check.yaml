@@ -1,9 +1,11 @@
 name: PR check
 
-# In order: commit messages and formatting (cheap, no package needed), which packages changed, then each of them (version, tests, pack) with CodeQL alongside. Nothing is published.
+# In order: commit messages, pull request title and formatting (cheap, no package needed), which packages changed, then each of them (version, tests, pack) with CodeQL alongside. Nothing is published.
+# "edited" (title or description changed) re-runs only the conventional-commit job, so fixing a title does not rebuild every package.
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -18,14 +20,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate commit messages
+      - name: Validate the pull request title and commit messages
         uses: ./.github/actions/conventional-commits
         with:
           base-sha: ${{ github.event.pull_request.base.sha }}
           head-sha: ${{ github.event.pull_request.head.sha }}
+          title: ${{ github.event.pull_request.title }}
 
   format:
     name: Format
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,6 +45,7 @@ jobs:
 
   detect:
     name: Changed packages
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     outputs:
       packages: ${{ steps.detect.outputs.packages }}

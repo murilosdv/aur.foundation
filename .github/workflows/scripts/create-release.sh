@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Inputs (environment): RECORDS_DIR, CHANGELOG, GH_TOKEN. Each record is a file "<name> <version>".
+# The notes are the changelog entries of the packages published in this run, one section each.
 set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/changelog.sh"
 
 if ! ls "$RECORDS_DIR"/*.txt > /dev/null 2>&1; then
   echo "Nothing was published in this run, no release." >> "$GITHUB_STEP_SUMMARY"
@@ -8,10 +11,17 @@ if ! ls "$RECORDS_DIR"/*.txt > /dev/null 2>&1; then
 fi
 
 LIST=""
+NOTES=""
 ALL_PRERELEASE=true
 while read -r NAME VERSION; do
   LIST="${LIST}${NAME} v${VERSION}, "
   case "$VERSION" in *-*) ;; *) ALL_PRERELEASE=false ;; esac
+
+  ENTRY="$(changelog_entry "$NAME" "$VERSION" "$CHANGELOG")"
+  if [ -z "$ENTRY" ]; then
+    ENTRY="No entry for $NAME-$VERSION in [$CHANGELOG](https://github.com/$GITHUB_REPOSITORY/blob/main/$CHANGELOG)."
+  fi
+  NOTES="${NOTES}## ${NAME} v${VERSION}"$'\n\n'"${ENTRY}"$'\n\n'
 done < <(cat "$RECORDS_DIR"/*.txt)
 LIST="${LIST%, }"
 
@@ -21,14 +31,8 @@ if gh release view "$TAG" > /dev/null 2>&1; then
   exit 0
 fi
 
-NOTES="$(awk '/^## \[Unreleased\]/{flag=1; next} /^## \[/{if (flag) exit} flag' "$CHANGELOG" | sed '/^---$/d')"
-if [ -z "$(echo "$NOTES" | tr -d '[:space:]')" ]; then
-  NOTES="No entry under **Unreleased** at release time. See [$CHANGELOG](https://github.com/$GITHUB_REPOSITORY/blob/main/$CHANGELOG)."
-fi
-
 {
-  echo "$NOTES"
-  echo ""
+  printf '%s' "$NOTES"
   echo "---"
   echo "Published: $LIST"
   echo "Commit: $GITHUB_SHA"

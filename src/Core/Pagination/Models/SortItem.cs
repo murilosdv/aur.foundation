@@ -26,12 +26,12 @@ public sealed record SortItem(string Field, SortDirection Direction)
 
         var field = parts[0].Trim();
 
-        if (field.Length == 0)
+        if (field.Length is 0)
             return false;
 
         var direction = SortDirection.Asc;
 
-        if (parts.Length == 2)
+        if (parts.Length is 2)
         {
             switch (parts[1].Trim().ToLowerInvariant())
             {

@@ -44,7 +44,9 @@ public static class RequestPipelineConfiguration
     /// <param name="builder">The host builder.</param>
     /// <param name="options">The settings of every part of the pipeline.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static IHostApplicationBuilder AddStandardRequestPipeline(this IHostApplicationBuilder builder, RequestPipelineOptions options)
+    public static IHostApplicationBuilder AddStandardRequestPipeline(
+        this IHostApplicationBuilder builder,
+        RequestPipelineOptions options)
     {
         builder.AddStandardCorsPolicies(options.CorsPolicies);
 
@@ -68,7 +70,9 @@ public static class RequestPipelineConfiguration
     /// <param name="builder">The application builder.</param>
     /// <param name="options">The settings of every part of the pipeline.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static IApplicationBuilder UseStandardRequestPipeline(this IApplicationBuilder builder, RequestPipelineOptions options)
+    public static IApplicationBuilder UseStandardRequestPipeline(
+        this IApplicationBuilder builder,
+        RequestPipelineOptions options)
     {
         return builder
             .UseForwardedHeaders()
@@ -108,7 +112,9 @@ public static class RequestPipelineConfiguration
             .AddEndpointFilter<TBuilder, IdempotencyFilter>();
     }
 
-    internal static IServiceCollection ConfigureStandardForwardedHeaders(this IServiceCollection services, ForwardedHeadersConfigurationOptions options)
+    internal static IServiceCollection ConfigureStandardForwardedHeaders(
+        this IServiceCollection services,
+        ForwardedHeadersConfigurationOptions options)
     {
         var proxies = options.KnownProxies.Select(IPAddress.Parse).ToArray();
         var networks = options.KnownNetworks.Select(x => System.Net.IPNetwork.Parse(x)).ToArray();
@@ -118,18 +124,16 @@ public static class RequestPipelineConfiguration
             o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
 
             foreach (var proxy in proxies)
-            {
                 o.KnownProxies.Add(proxy);
-            }
 
             foreach (var network in networks)
-            {
                 o.KnownIPNetworks.Add(network);
-            }
         });
     }
 
-    internal static IServiceCollection ConfigureStandardKestrelLimits(this IServiceCollection services, KestrelLimitsOptions options)
+    internal static IServiceCollection ConfigureStandardKestrelLimits(
+        this IServiceCollection services,
+        KestrelLimitsOptions options)
     {
         return services.Configure<KestrelServerOptions>(o =>
         {
@@ -146,16 +150,16 @@ public static class RequestPipelineConfiguration
     /// (declare a CancellationToken handler parameter; analyzer CA2016 enforces forwarding it).
     /// Timeouts are not enforced while a debugger is attached.
     /// </summary>
-    internal static IServiceCollection AddStandardRequestTimeouts(this IServiceCollection services, RequestTimeoutsConfigurationOptions options)
+    internal static IServiceCollection AddStandardRequestTimeouts(
+        this IServiceCollection services,
+        RequestTimeoutsConfigurationOptions options)
     {
         return services.AddRequestTimeouts(o =>
         {
             o.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(options.DefaultSeconds) };
 
             foreach (var (name, seconds) in options.Policies)
-            {
                 o.AddPolicy(name, TimeSpan.FromSeconds(seconds));
-            }
         });
     }
 
@@ -164,7 +168,9 @@ public static class RequestPipelineConfiguration
     /// Each caller gets its own window: the authenticated user id, or the client IP for anonymous requests.
     /// Limits are per instance: with N instances the effective limit is N times higher.
     /// </summary>
-    internal static IServiceCollection AddStandardRateLimiting(this IServiceCollection services, RateLimitingConfigurationOptions options)
+    internal static IServiceCollection AddStandardRateLimiting(
+        this IServiceCollection services,
+        RateLimitingConfigurationOptions options)
     {
         return services.AddRateLimiter(o =>
         {
@@ -189,7 +195,9 @@ public static class RequestPipelineConfiguration
     /// Registers named policies only; endpoints opt in with .CacheOutput("&lt;name&gt;"). The cache is shared by all callers
     /// unless the policy varies by a header such as Authorization.
     /// </summary>
-    internal static IServiceCollection AddStandardOutputCache(this IServiceCollection services, OutputCacheConfigurationOptions options)
+    internal static IServiceCollection AddStandardOutputCache(
+        this IServiceCollection services,
+        OutputCacheConfigurationOptions options)
     {
         return services.AddOutputCache(o =>
         {
@@ -203,9 +211,7 @@ public static class RequestPipelineConfiguration
                         .SetVaryByQuery(policy.VaryByQuery);
 
                     if (policy.VaryByHeader.Length > 0)
-                    {
                         builder.SetVaryByHeader(policy.VaryByHeader);
-                    }
                 });
             }
         });
@@ -215,7 +221,9 @@ public static class RequestPipelineConfiguration
     /// HybridCache keeps results in memory. Register an IDistributedCache (services.AddStackExchangeRedisCache(...)) and HybridCache
     /// picks it up as its second level; nothing else changes.
     /// </summary>
-    internal static IServiceCollection AddStandardIdempotency(this IServiceCollection services, IdempotencyOptions options)
+    internal static IServiceCollection AddStandardIdempotency(
+        this IServiceCollection services,
+        IdempotencyOptions options)
     {
         services.AddHybridCache();
 
@@ -232,26 +240,26 @@ public static class RequestPipelineConfiguration
             });
     }
 
-    internal static IApplicationBuilder UseStandardSecurityHeaders(this IApplicationBuilder builder, SecurityHeadersOptions options)
+    internal static IApplicationBuilder UseStandardSecurityHeaders(
+        this IApplicationBuilder builder,
+        SecurityHeadersOptions options)
     {
         var isProduction = builder.ApplicationServices.GetRequiredService<IHostEnvironment>().IsProduction();
 
         if (isProduction)
-        {
             builder.UseHsts();
-        }
 
         var effectiveOptions = isProduction ? options : options with { ContentSecurityPolicy = null };
 
         return builder.UseMiddleware<SecurityHeadersMiddleware>(effectiveOptions);
     }
 
-    private static async ValueTask WriteRateLimitedResponseAsync(OnRejectedContext context, CancellationToken cancellationToken)
+    private static async ValueTask WriteRateLimitedResponseAsync(
+        OnRejectedContext context,
+        CancellationToken cancellationToken)
     {
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-        {
             context.HttpContext.Response.Headers.RetryAfter = ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString(CultureInfo.InvariantCulture);
-        }
 
         await TypedResults
             .Problem(statusCode: StatusCodes.Status429TooManyRequests, title: "Too Many Requests", detail: "Too many requests. Retry later.")

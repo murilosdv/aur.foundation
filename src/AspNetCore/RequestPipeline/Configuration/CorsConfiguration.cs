@@ -39,12 +39,12 @@ public static class CorsConfiguration
     /// CORS is optional: without policies nothing is registered and browsers are limited to same-origin calls.
     /// Configure policies only when a browser app calls this service directly from another origin.
     /// </summary>
-    internal static IHostApplicationBuilder AddStandardCorsPolicies(this IHostApplicationBuilder builder, IReadOnlyDictionary<string, CorsPolicyOptions> policies)
+    internal static IHostApplicationBuilder AddStandardCorsPolicies(
+        this IHostApplicationBuilder builder,
+        IReadOnlyDictionary<string, CorsPolicyOptions> policies)
     {
-        if (policies.Count == 0)
-        {
+        if (policies.Count is 0)
             return builder;
-        }
 
         ValidatePolicies(policies, builder.Environment.IsProduction());
 
@@ -65,7 +65,9 @@ public static class CorsConfiguration
     /// <summary>
     /// Pairs with AddStandardCorsPolicies: UseCors() fails at startup when CORS services were never registered.
     /// </summary>
-    internal static IApplicationBuilder UseStandardCors(this IApplicationBuilder builder, IReadOnlyDictionary<string, CorsPolicyOptions> policies)
+    internal static IApplicationBuilder UseStandardCors(
+        this IApplicationBuilder builder,
+        IReadOnlyDictionary<string, CorsPolicyOptions> policies)
     {
         return policies.Count > 0 ? builder.UseCors() : builder;
     }
@@ -86,7 +88,7 @@ public static class CorsConfiguration
                 throw new InvalidOperationException($"CORS policy '{name}' cannot allow any origin ('*') in production.");
 
             var invalidOrigin = policy.AllowedOrigins.FirstOrDefault(x =>
-                x != "*" && (!Uri.TryCreate(x, UriKind.Absolute, out var uri) || uri.PathAndQuery != "/" || x.EndsWith('/')));
+                x is not "*" && (!Uri.TryCreate(x, UriKind.Absolute, out var uri) || uri.PathAndQuery is not "/" || x.EndsWith('/')));
 
             if (invalidOrigin is not null)
                 throw new InvalidOperationException($"CORS policy '{name}' has an invalid origin '{invalidOrigin}'. Origins must be scheme + host (+ port) with no path or trailing slash, e.g. 'https://app.example.com'.");

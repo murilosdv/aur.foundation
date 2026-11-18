@@ -17,7 +17,10 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Middlewares;
 /// else the trace id; invalid values are ignored. Personal data (client address, user agent) is encrypted in the log
 /// scope when privacy is on; the context keeps the real values.
 /// </summary>
-internal sealed class RequestContextMiddleware(RequestDelegate next, IPrivacyProtector privacy, ILogger<RequestContextMiddleware> logger)
+internal sealed class RequestContextMiddleware(
+    RequestDelegate next,
+    IPrivacyProtector privacy,
+    ILogger<RequestContextMiddleware> logger)
 {
     internal const int MinCorrelationIdLength = 12;
     internal const int MaxCorrelationIdLength = 64;

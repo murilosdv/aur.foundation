@@ -44,7 +44,7 @@ public static class PathExtensions
             var isDrivePath = path.StartsWith(WslPrefix, StringComparison.OrdinalIgnoreCase)
                 && path.Length > WslPrefix.Length
                 && char.IsAsciiLetter(path[WslPrefix.Length])
-                && (path.Length == WslPrefix.Length + 1 || path[WslPrefix.Length + 1] == '/');
+                && (path.Length == WslPrefix.Length + 1 || path[WslPrefix.Length + 1] is '/');
 
             if (!isDrivePath)
                 return path;
@@ -59,7 +59,7 @@ public static class PathExtensions
 
         private static string ToWslPath(string path)
         {
-            if (path.Length < 2 || path[1] != ':' || !char.IsAsciiLetter(path[0]))
+            if (path.Length < 2 || path[1] is not ':' || !char.IsAsciiLetter(path[0]))
                 return path;
 
             var drive = char.ToLowerInvariant(path[0]);

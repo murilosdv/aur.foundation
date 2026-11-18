@@ -100,7 +100,10 @@ public sealed class UniqueViolationDecoratorTests(PostgresFixture postgres) : IC
         Assert.IsType<DbUpdateException>(thrown);
     }
 
-    private static async Task<Core.Results.Result<System.Guid>> CreateAsync(ServiceProvider provider, string email, string name = "Ada")
+    private static async Task<Core.Results.Result<System.Guid>> CreateAsync(
+        ServiceProvider provider,
+        string email,
+        string name = "Ada")
     {
         await using var scope = provider.CreateAsyncScope();
 

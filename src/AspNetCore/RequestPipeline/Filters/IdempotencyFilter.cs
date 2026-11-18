@@ -22,7 +22,11 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Filters;
 /// and an Idempotency-Replayed header. Per-request headers (Correlation-Id, Date, ...) are those of the new request.
 /// This is a convenience for clients that retry; guarantee uniqueness in the database too.
 /// </summary>
-internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions options, RequestContext requestContext) : IEndpointFilter
+internal sealed class IdempotencyFilter(
+    HybridCache cache,
+    IdempotencyOptions options,
+    RequestContext requestContext)
+    : IEndpointFilter
 {
     /// <summary>
     /// Runs the endpoint the first time a key is seen and replays the stored result when the same caller repeats it.
@@ -98,12 +102,13 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
         return http.Response.Headers.ToDictionary(x => x.Key, x => x.Value.ToString(), StringComparer.OrdinalIgnoreCase);
     }
 
-    private static IdempotencyCacheEntry? Capture(HttpContext http, object? result, Dictionary<string, string> headersBefore)
+    private static IdempotencyCacheEntry? Capture(
+        HttpContext http,
+        object? result,
+        Dictionary<string, string> headersBefore)
     {
         while (result is INestedHttpResult nested)
-        {
             result = nested.Result;
-        }
 
         // A handler may return a plain object (written as 200 JSON); a string is written as text, which a JSON replay would change.
         int? statusCode = result switch
@@ -134,14 +139,15 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
             .ToDictionary(x => x.Key, x => x.Value.Select(v => v ?? string.Empty).ToArray());
 
         if (result?.GetType().GetProperty("Location")?.GetValue(result) is string location)
-        {
             headers["Location"] = [location];
-        }
 
         return new IdempotencyCacheEntry(status, body, headers);
     }
 
-    private sealed record IdempotencyCacheEntry(int StatusCode, JsonElement? Body, Dictionary<string, string[]> Headers);
+    private sealed record IdempotencyCacheEntry(
+        int StatusCode,
+        JsonElement? Body,
+        Dictionary<string, string[]> Headers);
 
     private sealed class NotCacheableResultException : Exception;
 
@@ -157,9 +163,7 @@ internal sealed class IdempotencyFilter(HybridCache cache, IdempotencyOptions op
             httpContext.Response.StatusCode = entry.StatusCode;
 
             foreach (var (name, values) in entry.Headers)
-            {
                 httpContext.Response.Headers[name] = values;
-            }
 
             httpContext.Response.Headers[CustomHeaderNames.IdempotencyReplayed] = "true";
 

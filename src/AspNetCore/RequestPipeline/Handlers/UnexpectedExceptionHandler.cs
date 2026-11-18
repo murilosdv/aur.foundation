@@ -28,7 +28,10 @@ internal sealed class UnexpectedExceptionHandler(ILogger<UnexpectedExceptionHand
     /// <param name="exception">The exception that escaped.</param>
     /// <param name="cancellationToken">A token to cancel the response.</param>
     /// <returns>True: the exception is always handled here.</returns>
-    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext context,
+        Exception exception,
+        CancellationToken cancellationToken)
     {
         switch (exception)
         {

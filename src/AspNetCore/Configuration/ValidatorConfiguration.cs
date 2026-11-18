@@ -23,7 +23,10 @@ public static class ValidatorConfiguration
     /// <param name="assemblies">The assemblies to scan.</param>
     /// <param name="includeInternalTypes">True to find validators that are not public, which is how most are declared.</param>
     /// <returns>The same service collection, for chaining.</returns>
-    public static IServiceCollection AddStandardValidators(this IServiceCollection services, IEnumerable<Assembly> assemblies, bool includeInternalTypes = true)
+    public static IServiceCollection AddStandardValidators(
+        this IServiceCollection services,
+        IEnumerable<Assembly> assemblies,
+        bool includeInternalTypes = true)
     {
         foreach (var result in AssemblyScanner.FindValidatorsInAssemblies(assemblies, includeInternalTypes))
         {
@@ -39,8 +42,6 @@ public static class ValidatorConfiguration
         var markerType = marker.MakeGenericType(result.InterfaceType.GetGenericArguments()[0]);
 
         if (markerType.IsAssignableFrom(result.ValidatorType))
-        {
             services.TryAddEnumerable(ServiceDescriptor.Scoped(markerType, result.ValidatorType));
-        }
     }
 }

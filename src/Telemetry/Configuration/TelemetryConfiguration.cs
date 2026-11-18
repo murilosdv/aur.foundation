@@ -37,7 +37,10 @@ public static class TelemetryConfiguration
     /// <param name="appInfo">The application information that identifies the service in the telemetry.</param>
     /// <param name="telemetry">The telemetry settings: collector endpoint, sampling and exporters.</param>
     /// <returns>The same builder, for chaining.</returns>
-    public static IHostApplicationBuilder AddStandardTelemetry(this IHostApplicationBuilder builder, AppInformationOptions appInfo, TelemetryOptions telemetry)
+    public static IHostApplicationBuilder AddStandardTelemetry(
+        this IHostApplicationBuilder builder,
+        AppInformationOptions appInfo,
+        TelemetryOptions telemetry)
     {
         builder.Logging.ClearProviders();
 
@@ -76,7 +79,11 @@ public static class TelemetryConfiguration
         }
     }
 
-    private static OpenTelemetryBuilder ConfigureAppResource(this OpenTelemetryBuilder builder, IHostEnvironment env, AppInformationOptions appInfo, TelemetryOptions telemetry)
+    private static OpenTelemetryBuilder ConfigureAppResource(
+        this OpenTelemetryBuilder builder,
+        IHostEnvironment env,
+        AppInformationOptions appInfo,
+        TelemetryOptions telemetry)
     {
         return builder
             .ConfigureResource(resource => resource
@@ -140,7 +147,10 @@ public static class TelemetryConfiguration
             });
     }
 
-    private static OpenTelemetryBuilder ConfigureTracing(this OpenTelemetryBuilder builder, AppInformationOptions appInfo, TelemetryOptions telemetry)
+    private static OpenTelemetryBuilder ConfigureTracing(
+        this OpenTelemetryBuilder builder,
+        AppInformationOptions appInfo,
+        TelemetryOptions telemetry)
     {
         var sampler = new ParentBasedSampler(new TraceIdRatioBasedSampler(telemetry.Tracing.SamplingRatio));
 
@@ -200,7 +210,7 @@ public static class TelemetryConfiguration
     /// </summary>
     internal static Uri BuildOtlpEndpoint(string collectorEndpoint, OtlpExportProtocol protocol, string signal)
     {
-        return protocol == OtlpExportProtocol.HttpProtobuf
+        return protocol is OtlpExportProtocol.HttpProtobuf
             ? new Uri($"{collectorEndpoint.TrimEnd('/')}/v1/{signal}")
             : new Uri(collectorEndpoint);
     }

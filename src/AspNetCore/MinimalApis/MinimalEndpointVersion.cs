@@ -10,7 +10,11 @@ namespace Aurore.Foundation.AspNetCore.MinimalApis;
 /// <param name="IsDeprecated">Advertised as deprecated in the api-deprecated-versions header and in the API document.</param>
 /// <param name="Sunset">Date the version stops being served; sent in the Sunset header. Requires <paramref name="IsDeprecated"/>.</param>
 /// <param name="Description">What this version is about; shown in the API document. Shared by every group declaring the version.</param>
-public readonly record struct MinimalEndpointVersion(int Number, bool IsDeprecated = false, DateOnly? Sunset = null, string? Description = null)
+public readonly record struct MinimalEndpointVersion(
+    int Number,
+    bool IsDeprecated = false,
+    DateOnly? Sunset = null,
+    string? Description = null)
 {
     /// <summary>
     /// Lets a plain number stand for a version without extra details.

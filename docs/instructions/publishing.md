@@ -5,12 +5,13 @@
 The version of a package is its line in [`Versions.props`](../../Versions.props), published as written. No pipeline bumps it.
 
 - A change under `src/<Package>` goes with a change of that package's version in the same pull request, and the reverse. The pipeline fails otherwise.
+- That version also needs its entry in the [changelog](./changelog.md): `## [<Package>-<version>]`, the first one of that package, and only one. The pipeline fails otherwise. This covers a new package too.
 - A preview has a suffix: `0.2.0-preview.1`.
 - A package is **changed** when its `src` folder or its `Versions.props` line changed. Only changed packages run, each on its own. Packages that depend on a changed one are not rebuilt.
 
 ## Pull request ([`pr-check.yaml`](../../.github/workflows/pr-check.yaml))
 
-1. Conventional Commits on every commit, and `dotnet format --verify-no-changes`.
+1. Conventional Commits on the pull request title and on every commit, and `dotnet format --verify-no-changes`. Editing the title re-runs only the Conventional Commits job.
 2. Detect the changed packages.
 3. Each changed package runs the pipeline without publishing, and CodeQL runs alongside (skipped when no package changed).
 
@@ -18,9 +19,9 @@ The version of a package is its line in [`Versions.props`](../../Versions.props)
 
 1. Detect the changed packages.
 2. Each changed package runs the pipeline and publishes, and CodeQL runs alongside. Tests run again because a merge can combine changes never tested together.
-3. One GitHub release lists what was published, with the `Unreleased` notes of the changelog. It is a pre-release when everything published is a preview. Nothing published, no release.
+3. One GitHub release lists what was published, with the changelog entry of each published package and version as the notes. It is a pre-release when everything published is a preview. Nothing published, no release.
 
-The manual run of `publish.yaml` can skip the version check, for a one-off fix such as a version corrected afterwards.
+The manual run of `publish.yaml` can skip the version check (which includes the changelog entry), for a one-off fix such as a version corrected afterwards.
 
 ## Package pipeline ([`package-pipeline.yaml`](../../.github/workflows/package-pipeline.yaml))
 

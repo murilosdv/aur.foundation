@@ -16,7 +16,11 @@ public sealed class TelemetryConfigurationTests
 
     [Theory(DisplayName = "The collector endpoint only gets a per-signal path over HTTP")]
     [MemberData(nameof(OtlpEndpoints))]
-    public void OtlpEndpointOnlyGetsASignalPathOverHttp(string collector, OtlpExportProtocol protocol, string signal, string expected)
+    public void OtlpEndpointOnlyGetsASignalPathOverHttp(
+        string collector,
+        OtlpExportProtocol protocol,
+        string signal,
+        string expected)
     {
         // Arrange
         // Act

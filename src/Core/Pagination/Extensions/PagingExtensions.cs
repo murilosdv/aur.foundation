@@ -97,7 +97,7 @@ public static class PagingExtensions
         if (steps.Any(x => x.Item.Field.Equals(SortMap.IdName, StringComparison.OrdinalIgnoreCase) is false && Nullable.GetUnderlyingType(x.Field.KeyType) is not null))
             throw new InvalidOperationException("A cursor cannot order by a nullable property: rows with a null never match the comparison. Do not allow it, or use numbered pages.");
 
-        if (steps.Count == 0 || steps[^1].Item.Field.Equals(SortMap.IdName, StringComparison.OrdinalIgnoreCase) is false)
+        if (steps.Count is 0 || steps[^1].Item.Field.Equals(SortMap.IdName, StringComparison.OrdinalIgnoreCase) is false)
             throw new InvalidOperationException($"{typeof(T).Name} has no 'Id' property, which cursors need to tell equal rows apart.");
 
         var fingerprint = request.Fingerprint();
@@ -223,13 +223,18 @@ public static class PagingExtensions
             }
         }
 
-        if (items.Count == 0 && sortMap is not null)
+        if (items.Count is 0 && sortMap is not null)
             items.AddRange(sortMap.Default);
 
         return items;
     }
 
-    private static void CheckRange(DateTimeOffset? from, DateTimeOffset? to, string fromName, string toName, Problems problems)
+    private static void CheckRange(
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        string fromName,
+        string toName,
+        Problems problems)
     {
         if (from is { } start && to is { } end && start >= end)
             problems.Add(toName, $"'{toName}' must be after '{fromName}'.");

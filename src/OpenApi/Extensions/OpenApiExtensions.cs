@@ -45,7 +45,10 @@ public static class OpenApiExtensions
     /// <param name="version">The API version the document describes.</param>
     /// <param name="appInfo">The name, description and maintainer to show.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardDocumentInfo(this OpenApiOptions options, MinimalEndpointVersion version, AppInformationOptions appInfo)
+    public static OpenApiOptions AddStandardDocumentInfo(
+        this OpenApiOptions options,
+        MinimalEndpointVersion version,
+        AppInformationOptions appInfo)
     {
         var notice = version switch
         {
@@ -81,7 +84,11 @@ public static class OpenApiExtensions
     /// <param name="authenticationScheme">The ASP.NET Core authentication scheme this documented scheme stands for.</param>
     /// <param name="schema">The scheme to document.</param>
     /// <param name="scopes">The scopes to list with the requirement.</param>
-    public static OpenApiOptions AddStandardSecuritySchemeAndRequirement(this OpenApiOptions options, string authenticationScheme, OpenApiSecurityScheme schema, params string[] scopes)
+    public static OpenApiOptions AddStandardSecuritySchemeAndRequirement(
+        this OpenApiOptions options,
+        string authenticationScheme,
+        OpenApiSecurityScheme schema,
+        params string[] scopes)
     {
         if (schema.Name.HasValue() is false)
             throw new ArgumentException("Security scheme must have a valid Name property.", nameof(schema));
@@ -126,7 +133,7 @@ public static class OpenApiExtensions
             .Concat(metadata.OfType<AuthorizationPolicy>().SelectMany(x => x.AuthenticationSchemes))
             .ToList();
 
-        return pinned.Count == 0 || pinned.Contains(authenticationScheme, StringComparer.OrdinalIgnoreCase);
+        return pinned.Count is 0 || pinned.Contains(authenticationScheme, StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool RequiresAuthorization(ApiDescription description)
@@ -160,7 +167,7 @@ public static class OpenApiExtensions
     /// <returns>The same options, for chaining.</returns>
     public static OpenApiOptions AddStandardApiKeySecurity(this OpenApiOptions options, ApiKeysOptions apiKeys)
     {
-        if (apiKeys.Clients.Count == 0)
+        if (apiKeys.Clients.Count is 0)
             return options;
 
         return options.AddStandardSecuritySchemeAndRequirement(ApiKeyDefaults.AuthenticationScheme, new OpenApiSecurityScheme
@@ -178,7 +185,9 @@ public static class OpenApiExtensions
     /// <param name="options">The OpenAPI options.</param>
     /// <param name="identityProvider">The identity provider whose discovery document is linked.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardOidcSecurity(this OpenApiOptions options, IdentityProviderOptions identityProvider)
+    public static OpenApiOptions AddStandardOidcSecurity(
+        this OpenApiOptions options,
+        IdentityProviderOptions identityProvider)
     {
         return options.AddStandardSecuritySchemeAndRequirement(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
         {
@@ -195,7 +204,9 @@ public static class OpenApiExtensions
     /// <param name="options">The OpenAPI options.</param>
     /// <param name="identityProvider">The identity provider: authorization and token paths and the scopes to list.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static OpenApiOptions AddStandardOAuth2Security(this OpenApiOptions options, IdentityProviderOptions identityProvider)
+    public static OpenApiOptions AddStandardOAuth2Security(
+        this OpenApiOptions options,
+        IdentityProviderOptions identityProvider)
     {
         var authority = identityProvider.AuthorityUrl.TrimEnd('/');
         var tokenUrl = new Uri($"{authority}/{identityProvider.TokenPath.TrimStart('/')}");
@@ -230,7 +241,7 @@ public static class OpenApiExtensions
         {
             foreach (var parameter in operation.Parameters?.OfType<OpenApiParameter>() ?? [])
             {
-                if (parameter.In == ParameterLocation.Query && parameter.Name.HasValue())
+                if (parameter.In is ParameterLocation.Query && parameter.Name.HasValue())
                     parameter.Name = parameter.Name.ToCamelCase();
             }
 
@@ -253,7 +264,7 @@ public static class OpenApiExtensions
 
             operation.Parameters ??= [];
 
-            if (operation.Parameters.All(p => p.Name != CustomHeaderNames.IdempotencyKey))
+            if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.IdempotencyKey))
             {
                 operation.Parameters.Add(new OpenApiParameter
                 {
@@ -292,7 +303,7 @@ public static class OpenApiExtensions
                 {
                     operation.Parameters ??= [];
 
-                    if (operation.Parameters.All(p => p.Name != CustomHeaderNames.CorrelationId))
+                    if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.CorrelationId))
                     {
                         operation.Parameters.Add(new OpenApiParameter
                         {

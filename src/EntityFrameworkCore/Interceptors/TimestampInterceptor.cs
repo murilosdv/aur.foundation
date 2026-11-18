@@ -24,7 +24,10 @@ public sealed class TimestampInterceptor(TimeProvider timeProvider) : SaveChange
     }
 
     /// <inheritdoc />
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
         Stamp(eventData.Context);
 

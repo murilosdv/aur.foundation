@@ -151,7 +151,7 @@ public sealed class PrivacyProtectorTests
         // Arrange
         var protector = PrivacyTestData.Protector();
         var token = protector.Protect(ClientAddress, "203.0.113.7")!;
-        var tampered = token[..10] + (token[10] == 'A' ? 'B' : 'A') + token[11..];
+        var tampered = token[..10] + (token[10] is 'A' ? 'B' : 'A') + token[11..];
 
         // Act
         var result = protector.Unprotect(tampered);

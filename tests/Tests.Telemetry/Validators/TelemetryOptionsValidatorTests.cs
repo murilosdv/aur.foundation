@@ -86,7 +86,12 @@ public sealed class TelemetryOptionsValidatorTests
 
     [Theory(DisplayName = "Rejects timeouts, intervals and sampling ratios that are out of range")]
     [MemberData(nameof(OutOfRangeValues))]
-    public void RejectsOutOfRangeValues(int requestTimeout, int interval, int exportTimeout, double ratio, string expectedProperty)
+    public void RejectsOutOfRangeValues(
+        int requestTimeout,
+        int interval,
+        int exportTimeout,
+        double ratio,
+        string expectedProperty)
     {
         // Arrange
         var options = Options() with

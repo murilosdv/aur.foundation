@@ -31,7 +31,10 @@ internal static class RoleClaimsMapper
         }
     }
 
-    private static IEnumerable<string> ReadRoles(ClaimsIdentity identity, IdentityProviderKind provider, string audience)
+    private static IEnumerable<string> ReadRoles(
+        ClaimsIdentity identity,
+        IdentityProviderKind provider,
+        string audience)
     {
         if (provider is IdentityProviderKind.Keycloak)
         {

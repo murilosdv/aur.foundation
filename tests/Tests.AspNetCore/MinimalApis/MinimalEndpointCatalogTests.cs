@@ -1,8 +1,15 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Aurore.Foundation.AspNetCore.Configuration;
 using Aurore.Foundation.AspNetCore.MinimalApis;
+using Aurore.Foundation.AspNetCore.MinimalApis.Configuration;
+using Aurore.Foundation.Tests.Shared.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Aurore.Foundation.Tests.AspNetCore.MinimalApis;
 
@@ -142,9 +149,91 @@ public sealed class MinimalEndpointCatalogTests
         Assert.Contains("share the route name 'same-route'", error.Message);
     }
 
+    [Fact(DisplayName = "Nothing set: the name and the summary are derived from the class")]
+    public async Task NothingSetUsesTheDerivedValues()
+    {
+        // Arrange & Act
+        var (name, summary, description) = await MappedMetadataAsync("derived", typeof(NamesGroup), typeof(DerivedNamesEndpoint));
+
+        // Assert
+        Assert.Equal("DerivedNames", name);
+        Assert.Equal("Derived Names", summary);
+        Assert.Null(description);
+    }
+
+    [Fact(DisplayName = "A property override replaces the derived values")]
+    public async Task PropertyOverrideReplacesTheDerivedValues()
+    {
+        // Arrange & Act
+        var (name, summary, description) = await MappedMetadataAsync("overridden", typeof(NamesGroup), typeof(OverriddenNamesEndpoint));
+
+        // Assert
+        Assert.Equal("CustomName", name);
+        Assert.Equal("Custom summary", summary);
+        Assert.Equal("Custom description", description);
+    }
+
+    [Fact(DisplayName = "WithName, WithSummary and WithDescription inside Map win over the derived values")]
+    public async Task FluentCallsWinOverTheDerivedValues()
+    {
+        // Arrange & Act
+        var (name, summary, description) = await MappedMetadataAsync("fluent", typeof(NamesGroup), typeof(FluentNamesEndpoint));
+
+        // Assert
+        Assert.Equal("FluentName", name);
+        Assert.Equal("Fluent summary", summary);
+        Assert.Equal("Fluent description", description);
+    }
+
+    [Fact(DisplayName = "WithName, WithSummary and WithDescription inside Map win over the property override")]
+    public async Task FluentCallsWinOverThePropertyOverride()
+    {
+        // Arrange & Act
+        var (name, summary, description) = await MappedMetadataAsync("fluent-over-override", typeof(NamesGroup), typeof(FluentOverOverrideNamesEndpoint));
+
+        // Assert
+        Assert.Equal("WinnerName", name);
+        Assert.Equal("Winner summary", summary);
+        Assert.Equal("Winner description", description);
+    }
+
+    [Fact(DisplayName = "Mapping fails when WithName gives two endpoints the same name")]
+    public async Task ThrowsAtStartWhenWithNameIsNotUnique()
+    {
+        // Arrange
+        Type[] types = [typeof(NamesGroup), typeof(FirstDuplicateNameEndpoint), typeof(SecondDuplicateNameEndpoint)];
+
+        // Act
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => MappedMetadataAsync("first-duplicate", types));
+
+        // Assert
+        Assert.Contains("share the route name 'Duplicated'", error.Message);
+    }
+
     private static MinimalEndpointCatalog Create(params Type[] types)
     {
         return MinimalEndpointCatalog.Create(types);
+    }
+
+    private static async Task<(string? Name, string? Summary, string? Description)> MappedMetadataAsync(string route, params Type[] types)
+    {
+        var catalog = Create(types);
+        EndpointDataSource? endpoints = null;
+
+        await using var app = await TestApp.StartAsync(
+            builder => builder.Services.AddStandardApiVersioning(catalog),
+            app =>
+            {
+                app.MapStandardMinimalEndpoints(catalog);
+                endpoints = app.Services.GetRequiredService<EndpointDataSource>();
+            });
+
+        var endpoint = endpoints!.Endpoints.OfType<RouteEndpoint>().Single(x => x.RoutePattern.RawText!.EndsWith(route, StringComparison.Ordinal));
+
+        return (
+            endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName,
+            endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()?.Summary,
+            endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()?.Description);
     }
 
     private abstract class TestEndpoint<TGroup> : MinimalEndpoint<TGroup>
@@ -249,5 +338,76 @@ public sealed class MinimalEndpointCatalogTests
     private sealed class SecondSameNameGroup : ResourceGroup
     {
         public override string Name => "same";
+    }
+
+    private sealed class NamesGroup : ResourceGroup
+    {
+        public override bool RequireAuthorization => false;
+    }
+
+    private sealed class DerivedNamesEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("derived", () => "ok");
+        }
+    }
+
+    private sealed class OverriddenNamesEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override string? Name => "CustomName";
+
+        public override string Summary => "Custom summary";
+
+        public override string? Description => "Custom description";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("overridden", () => "ok");
+        }
+    }
+
+    private sealed class FluentNamesEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("fluent", () => "ok")
+                .WithName("FluentName")
+                .WithSummary("Fluent summary")
+                .WithDescription("Fluent description");
+        }
+    }
+
+    private sealed class FluentOverOverrideNamesEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override string? Name => "IgnoredName";
+
+        public override string Summary => "Ignored summary";
+
+        public override string? Description => "Ignored description";
+
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("fluent-over-override", () => "ok")
+                .WithName("WinnerName")
+                .WithSummary("Winner summary")
+                .WithDescription("Winner description");
+        }
+    }
+
+    private sealed class FirstDuplicateNameEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("first-duplicate", () => "ok").WithName("Duplicated");
+        }
+    }
+
+    private sealed class SecondDuplicateNameEndpoint : MinimalEndpoint<NamesGroup>
+    {
+        public override RouteHandlerBuilder Map(IEndpointRouteBuilder builder)
+        {
+            return builder.MapGet("second-duplicate", () => "ok").WithName("Duplicated");
+        }
     }
 }

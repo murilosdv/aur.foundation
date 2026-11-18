@@ -14,7 +14,9 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Configuration;
 [ExcludeFromCodeCoverage]
 public static class RequestContextConfiguration
 {
-    internal static IServiceCollection AddStandardRequestContext(this IServiceCollection services, PrivacyOptions privacy)
+    internal static IServiceCollection AddStandardRequestContext(
+        this IServiceCollection services,
+        PrivacyOptions privacy)
     {
         return services
             .AddSingleton<IPrivacyProtector>(new PrivacyProtector(privacy))

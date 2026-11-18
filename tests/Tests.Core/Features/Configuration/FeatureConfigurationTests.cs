@@ -1,5 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Aurore.Foundation.Core.Errors;
+using Aurore.Foundation.Core.Features;
+using Aurore.Foundation.Core.Features.Attributes;
+using Aurore.Foundation.Core.Results;
 using Aurore.Foundation.Tests.Core.Features.Support;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -141,5 +145,107 @@ public sealed class FeatureConfigurationTests
         Assert.NotSame(a, c);
         Assert.Null(provider.GetService<AbstractFeature>());
         Assert.Null(provider.GetService<NotAFeature>());
+    }
+}
+
+public abstract class AbstractFeature : Feature<Ping, string>;
+
+public sealed class CommandFeature(Trace trace) : Feature<Ping>
+{
+    protected override ValueTask<Result> ExecuteAsync(Ping request, CancellationToken cancellationToken)
+    {
+        trace.Steps.Add("feature");
+
+        return ValueTask.FromResult(Result.Success);
+    }
+}
+
+[With<FirstDecorator>]
+[Without<FirstDecorator>]
+public sealed class ContradictoryFeature(Trace trace) : Feature<Ping, string>
+{
+    protected override ValueTask<Result<string>> ExecuteAsync(Ping request, CancellationToken cancellationToken)
+    {
+        trace.Steps.Add("feature");
+
+        return ValueTask.FromResult(Result<string>.Success("ok"));
+    }
+}
+
+/// <summary>
+/// A custom decorator that does not set an Order, so it takes the default and runs last.
+/// </summary>
+public sealed class DefaultOrderDecorator(Trace trace) : IFeatureDecorator
+{
+    public async ValueTask<Result> InvokeAsync(FeatureContext context, FeatureDelegate next)
+    {
+        trace.Steps.Add("default:before");
+
+        return await next();
+    }
+}
+
+public sealed class FirstDecorator(Trace trace) : IFeatureDecorator
+{
+    public int Order => 100;
+
+    public async ValueTask<Result> InvokeAsync(FeatureContext context, FeatureDelegate next)
+    {
+        trace.Steps.Add("first:before");
+        var result = await next();
+        trace.Steps.Add("first:after");
+
+        return result;
+    }
+}
+
+[With<FirstDecorator>]
+public sealed class FirstFeature(Trace trace) : Feature<Ping, string>
+{
+    protected override ValueTask<Result<string>> ExecuteAsync(Ping request, CancellationToken cancellationToken)
+    {
+        trace.Steps.Add("feature");
+
+        return ValueTask.FromResult(Result<string>.Success("ok"));
+    }
+}
+
+public abstract class NotAFeature;
+
+[Without<FirstDecorator>]
+public sealed class QuietFeature(Trace trace) : Feature<Ping, string>
+{
+    protected override ValueTask<Result<string>> ExecuteAsync(Ping request, CancellationToken cancellationToken)
+    {
+        trace.Steps.Add("feature");
+
+        return ValueTask.FromResult(Result<string>.Success("ok"));
+    }
+}
+
+/// <summary>
+/// Answers on its own, without calling the feature.
+/// </summary>
+public sealed class RefusingDecorator : IFeatureDecorator
+{
+    public static readonly ApplicationError Refused = ApplicationError.Forbidden("test.refused", "Refused.");
+
+    public ValueTask<Result> InvokeAsync(FeatureContext context, FeatureDelegate next)
+    {
+        return ValueTask.FromResult<Result>(Refused);
+    }
+}
+
+public sealed class SecondDecorator(Trace trace) : IFeatureDecorator
+{
+    public int Order => 200;
+
+    public async ValueTask<Result> InvokeAsync(FeatureContext context, FeatureDelegate next)
+    {
+        trace.Steps.Add("second:before");
+        var result = await next();
+        trace.Steps.Add("second:after");
+
+        return result;
     }
 }

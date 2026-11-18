@@ -37,7 +37,10 @@ internal sealed class ClientCredentialsTokenCache(IHttpClientFactory clientFacto
     /// <param name="cancellationToken">A token to cancel the request.</param>
     /// <returns>A valid access token: the cached one, or a new one when it is missing or about to expire.</returns>
     /// <exception cref="HttpRequestException">The token endpoint refused the request or answered without a token.</exception>
-    public async ValueTask<string> GetTokenAsync(string key, ClientCredentialsOptions options, CancellationToken cancellationToken)
+    public async ValueTask<string> GetTokenAsync(
+        string key,
+        ClientCredentialsOptions options,
+        CancellationToken cancellationToken)
     {
         if (TryGetValid(key, out var token))
             return token;
@@ -79,7 +82,10 @@ internal sealed class ClientCredentialsTokenCache(IHttpClientFactory clientFacto
         return false;
     }
 
-    private async Task<TokenResponse> RequestTokenAsync(string key, ClientCredentialsOptions options, CancellationToken cancellationToken)
+    private async Task<TokenResponse> RequestTokenAsync(
+        string key,
+        ClientCredentialsOptions options,
+        CancellationToken cancellationToken)
     {
         var form = new Dictionary<string, string>
         {

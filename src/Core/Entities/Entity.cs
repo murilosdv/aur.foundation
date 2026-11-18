@@ -17,12 +17,3 @@ public abstract class Entity : IEntity, ITimestamped
     /// <inheritdoc />
     public DateTimeOffset UpdatedAt { get; set; }
 }
-
-/// <summary>
-/// <see cref="Entity"/> that is marked as deleted instead of removed.
-/// </summary>
-public abstract class SoftDeletableEntity : Entity, ISoftDeletable
-{
-    /// <inheritdoc />
-    public DateTimeOffset? DeletedAt { get; set; }
-}

@@ -21,7 +21,9 @@ public static class SwaggerUiExtensions
     /// <param name="options">The UI options.</param>
     /// <param name="versions">The API versions, in the order they are listed.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static SwaggerUIOptions WithStandardDocuments(this SwaggerUIOptions options, IEnumerable<MinimalEndpointVersion> versions)
+    public static SwaggerUIOptions WithStandardDocuments(
+        this SwaggerUIOptions options,
+        IEnumerable<MinimalEndpointVersion> versions)
     {
         foreach (var version in versions)
         {
@@ -41,7 +43,10 @@ public static class SwaggerUiExtensions
     /// <param name="identityProvider">The identity provider the sign-in goes to.</param>
     /// <param name="apiDocs">The client id registered for the documentation.</param>
     /// <returns>The same options, for chaining.</returns>
-    public static SwaggerUIOptions WithStandardAuthentication(this SwaggerUIOptions options, IdentityProviderOptions identityProvider, ApiDocsOptions apiDocs)
+    public static SwaggerUIOptions WithStandardAuthentication(
+        this SwaggerUIOptions options,
+        IdentityProviderOptions identityProvider,
+        ApiDocsOptions apiDocs)
     {
         if (apiDocs.OAuthClientId.HasValue() is false)
             return options;

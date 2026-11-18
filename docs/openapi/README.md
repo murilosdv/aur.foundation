@@ -74,7 +74,7 @@ The padlock is decided **per operation** from the endpoint's metadata:
 
 The interface shows what the endpoint says about itself:
 
-- `Summary` and `Description` of the endpoint class;
+- `Summary` and `Description` of the endpoint class, or `.WithSummary(…)` / `.WithDescription(…)` in its `Map`, which win ([order](../aspnetcore/minimal-endpoints.md#name-summary-and-description-the-last-one-wins));
 - `.Produces<T>()`, `.ProducesPage<T>()`, `.ProducesCursorPage<T>()`, `.ProducesProblem(404)`;
 - `[Description("…")]` on request properties (the pagination requests already have them);
 - XML comments, through the interceptor above.

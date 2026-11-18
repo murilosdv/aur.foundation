@@ -35,7 +35,7 @@ public static class StringExtensions
 
         foreach (var c in normalized)
         {
-            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            if (CharUnicodeInfo.GetUnicodeCategory(c) is not UnicodeCategory.NonSpacingMark)
                 builder.Append(c);
         }
 
@@ -68,14 +68,15 @@ public static class StringExtensions
         {
             if (char.IsLetterOrDigit(value[i]))
             {
-                if (start < 0)
+                switch (start)
                 {
-                    start = i;
-                }
-                else if (IsCaseBoundary(value, i))
-                {
-                    words.Add(value[start..i]);
-                    start = i;
+                    case < 0:
+                        start = i;
+                        break;
+                    case >= 0 when IsCaseBoundary(value, i):
+                        words.Add(value[start..i]);
+                        start = i;
+                        break;
                 }
 
                 continue;

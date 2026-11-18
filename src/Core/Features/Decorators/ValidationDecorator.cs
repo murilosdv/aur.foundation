@@ -35,7 +35,7 @@ public sealed class ValidationDecorator : IFeatureDecorator
 
         var outcome = await validate(context.Services, context.Request, context.CancellationToken);
 
-        return outcome.Failures.Count == 0
+        return outcome.Failures.Count is 0
             ? await next()
             : outcome.Failures.ToApplicationError(outcome.Error);
     }
