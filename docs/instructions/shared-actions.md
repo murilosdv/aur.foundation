@@ -14,7 +14,7 @@ Composite actions in `.github/actions`, used by this repository's workflows and 
 | `coverage-summary` | Writes a Cobertura report as a table in the job summary. | `name`, `file-name`, `class-filters` |
 | `pack-package` | Packs a project into `./nupkg`. | `project`, `configuration` |
 | `publish-package` | Pushes `./nupkg` to a NuGet feed (the owner's GitHub Packages by default). | `api-key`, `source` |
-| `create-release` | Creates a GitHub release from the published records, with the changelog entry of each published package and version as the notes. | `records-dir`, `changelog`, `token` |
+| `create-release` | Creates a GitHub release from the published records, with the changelog entry of each published package and version as the notes and a short title (the packages up to three, otherwise the shared version or the date with the package count). | `records-dir`, `changelog`, `token` |
 
 ## Use
 

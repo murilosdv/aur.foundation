@@ -12,8 +12,12 @@ fi
 
 LIST=""
 NOTES=""
+COUNT=0
+VERSIONS=()
 ALL_PRERELEASE=true
 while read -r NAME VERSION; do
+  COUNT=$((COUNT + 1))
+  VERSIONS+=("$VERSION")
   LIST="${LIST}${NAME} v${VERSION}, "
   case "$VERSION" in *-*) ;; *) ALL_PRERELEASE=false ;; esac
 
@@ -24,6 +28,15 @@ while read -r NAME VERSION; do
   NOTES="${NOTES}## ${NAME} v${VERSION}"$'\n\n'"${ENTRY}"$'\n\n'
 done < <(cat "$RECORDS_DIR"/*.txt)
 LIST="${LIST%, }"
+
+# The title stays short: the packages when there are few, otherwise the shared version or the date. The full list is in the notes.
+if [ "$COUNT" -le 3 ]; then
+  TITLE="Release: $LIST"
+elif [ "$(printf '%s\n' "${VERSIONS[@]}" | sort -u | wc -l)" -eq 1 ]; then
+  TITLE="Release v${VERSIONS[0]} ($COUNT packages)"
+else
+  TITLE="Release $(date -u +%F) ($COUNT packages, several versions)"
+fi
 
 TAG="release-$(git rev-parse --short HEAD)"
 if gh release view "$TAG" > /dev/null 2>&1; then
@@ -41,4 +54,4 @@ fi
 FLAGS=()
 if [ "$ALL_PRERELEASE" = "true" ]; then FLAGS+=(--prerelease); fi
 
-gh release create "$TAG" --title "Release: $LIST" --notes-file release-notes.md --target "$GITHUB_SHA" "${FLAGS[@]}"
+gh release create "$TAG" --title "$TITLE" --notes-file release-notes.md --target "$GITHUB_SHA" "${FLAGS[@]}"

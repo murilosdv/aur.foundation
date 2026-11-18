@@ -19,7 +19,7 @@ The version of a package is its line in [`Versions.props`](../../Versions.props)
 
 1. Detect the changed packages.
 2. Each changed package runs the pipeline and publishes, and CodeQL runs alongside. Tests run again because a merge can combine changes never tested together.
-3. One GitHub release lists what was published, with the changelog entry of each published package and version as the notes. It is a pre-release when everything published is a preview. Nothing published, no release.
+3. One GitHub release lists what was published, with the changelog entry of each published package and version as the notes. The title lists the packages when there are up to three; with more it shows the shared version (`Release v1.0.0 (9 packages)`) or the date when the versions differ (`Release 2026-11-18 (9 packages, several versions)`). It is a pre-release when everything published is a preview. Nothing published, no release.
 
 The manual run of `publish.yaml` can skip the version check (which includes the changelog entry), for a one-off fix such as a version corrected afterwards.
 
