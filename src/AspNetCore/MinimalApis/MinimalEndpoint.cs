@@ -17,17 +17,17 @@ public abstract class MinimalEndpoint<TResourceGroup> : IMinimalEndpoint
     public virtual int Version { get; } = 1;
 
     /// <summary>
-    /// An explicit route name. Defaults to one derived from the summary.
+    /// An explicit route name. Defaults to one derived from the summary. A <c>WithName</c> call inside <see cref="Map"/> wins over it.
     /// </summary>
     public virtual string? Name { get; }
 
     /// <summary>
-    /// The short title shown in the API document. Defaults to the class name without "Endpoint", in title case.
+    /// The short title shown in the API document. Defaults to the class name without "Endpoint", in title case. A <c>WithSummary</c> call inside <see cref="Map"/> wins over it.
     /// </summary>
     public virtual string Summary => GetType().Name.Replace("Endpoint", string.Empty).ToTitleCase();
 
     /// <summary>
-    /// A longer description shown in the API document, if any.
+    /// A longer description shown in the API document, if any. A <c>WithDescription</c> call inside <see cref="Map"/> wins over it.
     /// </summary>
     public virtual string? Description { get; }
 
