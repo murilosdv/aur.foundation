@@ -4,7 +4,7 @@
 
 ## Checklist
 
-- [ ] If this touches `src/<Package>/`, the matching version in `Versions.props` was changed in this same PR (CI fails the package otherwise); a preview is a version like `0.2.0-preview.1`.
-- [ ] For every package changed: its version in `Versions.props` was bumped and `CHANGELOG.md` has the entry `## [<Package>-<version>]` for it.
-- [ ] Tests were added or updated for the behavior being changed.
-- [ ] `dotnet format Foundation.slnx --verify-no-changes` passes locally.
+<!-- Version bump, changelog entry, formatting and Conventional Commits are enforced by the PR check, so they are not listed here. -->
+
+- [ ] The behavior I changed or added has a test that fails without it.
+- [ ] Docs, guides and instructions that mention it were updated (`docs/`, XML docs, `README.md`), since every project builds on this one.
