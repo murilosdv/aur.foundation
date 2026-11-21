@@ -6,7 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 ARG SOLUTION
 WORKDIR /src
 
-COPY global.json Directory.Build.props Versions.props .editorconfig $SOLUTION ./
+COPY global.json Directory.Build.props Directory.Packages.props Versions.props .editorconfig $SOLUTION ./
 COPY --parents src/*/*.csproj tests/*/*.csproj ./
 RUN dotnet restore "$SOLUTION"
 
@@ -21,7 +21,7 @@ COPY <<'SCRIPT' run-tests.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
-for package in Core AspNetCore Telemetry OpenApi OpenApi.Scalar OpenApi.Swagger EntityFrameworkCore EntityFrameworkCore.Postgres EntityFrameworkCore.SqlServer; do
+for package in Core AspNetCore Telemetry OpenApi OpenApi.Scalar OpenApi.Swagger EntityFrameworkCore EntityFrameworkCore.Postgres; do
     dotnet test "tests/Tests.$package" --no-restore --configuration Release \
         --coverage --coverage-output-format cobertura --coverage-output "$package.cobertura.xml"
 done

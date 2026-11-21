@@ -74,4 +74,4 @@ Format strings for log timestamps: `TimeOnly` (`HH:mm:ss`), `TimeOnlyWithTrailin
 | AspNetCore | `CustomHeaderNames`, `ApiKeyDefaults`, `AuthenticationDefaults`, `KeycloakClaims` |
 | OpenApi | `SecuritySchemes` |
 | EntityFrameworkCore | `DatabaseDefaults.Schema` (`app`), `QueryFilters.SoftDelete` |
-| Postgres / SqlServer | `PostgresSqlStates`, `SqlServerErrorNumbers` (inheritable) |
+| Postgres | `PostgresSqlStates` (inheritable) |

@@ -5,6 +5,9 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/changelog.sh"
 
+# The id of a package on nuget.org is this prefix and the folder name under src, so each section of the notes links to its version there.
+PACKAGE_ID_PREFIX="${PACKAGE_ID_PREFIX:-Aurore.Foundation.}"
+
 if ! ls "$RECORDS_DIR"/*.txt > /dev/null 2>&1; then
   echo "Nothing was published in this run, no release." >> "$GITHUB_STEP_SUMMARY"
   exit 0
@@ -25,7 +28,7 @@ while read -r NAME VERSION; do
   if [ -z "$ENTRY" ]; then
     ENTRY="No entry for $NAME-$VERSION in [$CHANGELOG](https://github.com/$GITHUB_REPOSITORY/blob/main/$CHANGELOG)."
   fi
-  NOTES="${NOTES}## ${NAME} v${VERSION}"$'\n\n'"${ENTRY}"$'\n\n'
+  NOTES="${NOTES}## ${NAME} v${VERSION}"$'\n\n'"[${PACKAGE_ID_PREFIX}${NAME} ${VERSION} on nuget.org](https://www.nuget.org/packages/${PACKAGE_ID_PREFIX}${NAME}/${VERSION})"$'\n\n'"${ENTRY}"$'\n\n'
 done < <(cat "$RECORDS_DIR"/*.txt)
 LIST="${LIST%, }"
 

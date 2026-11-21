@@ -8,6 +8,5 @@
         <OpenApiSwaggerVersion>1.0.0-preview.2</OpenApiSwaggerVersion>
         <EntityFrameworkCoreVersion>1.0.0-preview.2</EntityFrameworkCoreVersion>
         <EntityFrameworkCorePostgresVersion>1.0.0-preview.2</EntityFrameworkCorePostgresVersion>
-        <EntityFrameworkCoreSqlServerVersion>1.0.0-preview.2</EntityFrameworkCoreSqlServerVersion>
     </PropertyGroup>
 </Project>

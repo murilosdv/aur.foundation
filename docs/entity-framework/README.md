@@ -7,7 +7,6 @@
 | Package | Database | Guide |
 |---|---|---|
 | `Aurore.Foundation.EntityFrameworkCore.Postgres` | PostgreSQL (Npgsql) | [Postgres](./postgres.md) |
-| `Aurore.Foundation.EntityFrameworkCore.SqlServer` | SQL Server (Microsoft.Data.SqlClient) | [SQL Server](./sqlserver.md) |
 
 ```
 dotnet add package Aurore.Foundation.EntityFrameworkCore.Postgres     # brings the base package
@@ -35,7 +34,7 @@ The provider package has the overload that takes its connection settings:
 
 ```csharp
 services.AddSingleton(TimeProvider.System);                                  // the interceptors read the time from here
-services.AddStandardDbContext<AppDbContext>(appSettings.Postgres);           // or appSettings.SqlServer
+services.AddStandardDbContext<AppDbContext>(appSettings.Postgres);
 ```
 
 It registers the context with:
@@ -91,8 +90,8 @@ internal sealed class PostConfiguration : EntityConfigurationBase<Post>
 
 ## Health check
 
-Each provider adds a readiness check that runs `SELECT 1` ([Postgres](./postgres.md#health-check), [SQL Server](./sqlserver.md#health-check)); it feeds `/health/ready` ([health checks](../aspnetcore/health-checks.md)).
+The provider adds a readiness check that runs `SELECT 1` ([Postgres](./postgres.md#health-check)); it feeds `/health/ready` ([health checks](../aspnetcore/health-checks.md)).
 
 ## Testing
 
-The provider packages' own tests run on a **real PostgreSQL and a real SQL Server** (the EF tests are written once as abstract classes and run by each provider), because a fake database only proves the fake works. See [testing](../instructions/testing.md).
+The provider package's own tests run on a **real PostgreSQL** (the EF tests are written once as abstract classes and run by each provider, so a new provider gets the whole set), because a fake database only proves the fake works. See [testing](../instructions/testing.md).

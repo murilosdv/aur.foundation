@@ -24,14 +24,13 @@ dotnet ef migrations has-pending-model-changes --project tools/Tools.Migrations 
 dotnet ef database update          --project tools/Tools.Migrations -- "<connection string>"
 ```
 
-`PostgresOptions.ToConnectionString()` and `SqlServerOptions.ToConnectionString()` build the string from the same settings the service uses.
+`PostgresOptions.ToConnectionString()` builds the string from the same settings the service uses.
 
 ## The history table
 
 The history table is built apart from `OnModelCreating`, so the naming convention would not reach it:
 
 - **Postgres:** `__EFMigrationsHistory` keeps its Npgsql name but gets snake case columns and key (`UseSnakeCaseNpgsqlHistoryTable`).
-- **SQL Server:** `app.ef_migrations_history`.
 
 ## Practices
 

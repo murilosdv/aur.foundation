@@ -16,7 +16,7 @@ Our own logic, never the framework or a package: a test that would pass with our
 | `Tests.Core`, `Tests.AspNetCore`, `Tests.Telemetry` | Unit tests. `Tests.AspNetCore` also runs the request pipeline and JWT authentication on an in-memory host. |
 | `Tests.OpenApi`, `.Scalar`, `.Swagger` | Documents and UIs, each on an in-memory host. |
 | `Tests.EntityFrameworkCore` | The tests every provider must pass (soft delete, timestamps, paging, conventions), written once as abstract classes, plus provider-independent ones. |
-| `Tests.EntityFrameworkCore.Postgres`, `.SqlServer` | Run those tests on a real server of the provider, and test what is specific to it. A new provider gets the whole set by adding a fixture and one small class per test. |
+| `Tests.EntityFrameworkCore.Postgres` | Runs those tests on a real PostgreSQL, and tests what is specific to it. A new provider gets the whole set by adding a fixture and one small class per test. |
 | `Tests.Shared` | Stubs and the in-memory host (`TestApp`). No tests. |
 
 Real Keycloak tokens are tested in the [archetype](https://github.com/murilosdv/aur.archetypes.api), which has the host and identity provider they need.
@@ -25,14 +25,13 @@ Real Keycloak tokens are tested in the [archetype](https://github.com/murilosdv/
 
 Tests that need a server are marked `[Trait("Category", "Integration")]`, the others `Unit`. Run without servers with `--filter-not-trait "Category=Integration"`.
 
-They use real servers because a fake only proves the fake works (SQL translation of sorting and keyset conditions, real unique violations). **The servers must already be running:**
+They use a real server because a fake only proves the fake works (SQL translation of sorting and keyset conditions, real unique violations). **The server must already be running:**
 
 | Server | Address | Login |
 |---|---|---|
 | PostgreSQL | `127.0.0.1:5432` | `postgres` / `postgres` |
-| SQL Server | `127.0.0.1:1433` | `sa` / `SqlServer@123Dev` |
 
-The machine's dev-sbx (`.dev-sbx`) provides both: `make sbx-up` starts it with both databases (`make sbx-up DB=postgres` for one, `make sbx-down` removes its containers). Each test class creates its own database and drops it afterwards. `TEST_POSTGRES_HOST` and `TEST_SQLSERVER_HOST` change the host.
+The machine's dev-sbx (`.dev-sbx`) provides it: `make sbx-up` starts it (`make sbx-down` removes its containers). Each test class creates its own database and drops it afterwards. `TEST_POSTGRES_HOST` changes the host.
 Without a server the tests fail with a message that says so; they never skip, since a silent skip hides regressions.
 
 Use `127.0.0.1`, not `localhost`: `localhost` resolves to `::1` first, and Docker in WSL does not forward IPv6.
@@ -49,7 +48,7 @@ make test                                                                       
 ```
 
 `make` also has `test-local` (runs `dotnet format` first, then the tests), `report` (opens the coverage report), `clean`, and `sbx-up` / `sbx-down` for the dev-sbx. Results go to `artifacts/test-results`, the coverage report to `artifacts/coverage-report/index.html`.
-The container run matches CI (Linux, Release) and reaches the servers on the `dev-sbx` network as `sbx-postgres` and `sbx-sqlserver`.
+The container run matches CI (Linux, Release) and reaches the server on the `dev-sbx` network as `sbx-postgres`.
 
 ## Coverage
 

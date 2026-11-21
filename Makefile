@@ -2,12 +2,11 @@ SOLUTION_FILE := Foundation.slnx
 
 .PHONY: sbx-up sbx-down test test-local report clean
 
-# The dev-sbx (.dev-sbx next to this repository) runs on its own; these call its Makefile. The tests need both databases.
-#   make sbx-up   |   make sbx-up DB=postgres   |   make sbx-down
-DB ?= all
+# The dev-sbx (.dev-sbx next to this repository) runs on its own; these call its Makefile.
+#   make sbx-up   |   make sbx-down
 
 sbx-up:
-	$(MAKE) -C ../.dev-sbx docker-up DB=$(DB)
+	$(MAKE) -C ../.dev-sbx docker-up
 
 sbx-down:
 	$(MAKE) -C ../.dev-sbx docker-down

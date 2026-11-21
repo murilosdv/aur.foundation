@@ -20,6 +20,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: conditions written as pattern matching, one-line blocks without braces and long signatures wrapped.
 
 ---
@@ -28,6 +30,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: conditions written as pattern matching, long signatures wrapped, the API key option validation written as a `switch` (same checks, same messages), and `SoftDeletableEntity` and `WithAttribute<T>` in files of their own, in the same namespaces.
 
 ---
@@ -36,6 +40,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: conditions written as pattern matching and long signatures wrapped.
 
 ---
@@ -44,6 +50,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: long signatures wrapped.
 
 ---
@@ -52,6 +60,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: long signatures wrapped.
 
 ---
@@ -60,6 +70,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: conditions written as pattern matching, long signatures wrapped and an empty block removed.
 
 ---
@@ -68,6 +80,8 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: conditions written as pattern matching and long signatures wrapped.
 
 ---
@@ -76,15 +90,9 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ### Changed
 
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
 - Internal cleanup, no change in behavior or public API: long signatures wrapped and `WithUniqueViolationAttribute` in a file of its own, in the same namespace.
-
----
-
-## [EntityFrameworkCore.SqlServer-1.0.0-preview.2] - 2026-11-18
-
-### Changed
-
-- Internal cleanup, no change in behavior or public API: long signatures wrapped, and `WithUniqueViolationAttribute` and `SqlServerHealthCheck` in files of their own, in the same namespaces.
 
 ---
 
@@ -150,10 +158,3 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 - The PostgreSQL provider: Npgsql registration, snake case history table, partial indexes, a decorator that answers unique violations with a conflict and a health check.
 
----
-
-## [EntityFrameworkCore.SqlServer-1.0.0-preview.1] - 2026-11-15
-
-### Added
-
-- The SQL Server provider: clustering on a sequential column for Guid keys (`UseSequentialClusteredIndex`), SqlClient registration, filtered indexes, column helpers, a decorator that answers duplicate key errors with a conflict (needs the server messages in English) and a health check.

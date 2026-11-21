@@ -87,7 +87,7 @@ public abstract class PagingContract<TFixture>(TFixture database) : IClassFixtur
         var ages = result.Value.Items.Select(x => x.Age).ToList();
         Assert.Equal(ages.OrderByDescending(x => x), ages);
 
-        // The order of the ids is the one of the database: SQL Server does not sort a Guid the way .NET does.
+        // The order of the ids is the one of the database: the database may not sort a Guid the way .NET does.
         var rank = (await db.People.OrderBy(x => x.Id).Select(x => x.Id).ToListAsync(TestContext.Current.CancellationToken))
             .Select((id, position) => (id, position))
             .ToDictionary(x => x.id, x => x.position);

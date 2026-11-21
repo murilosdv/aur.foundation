@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Inputs (environment): BASE_SHA, HEAD_SHA.
 # Outputs: packages (JSON array of the folder names under src), any (true/false), base-sha (the commit really compared against).
-# A package is changed when its folder under src changed or its version in Versions.props did.
+# A package is changed when its folder under src changed, a dependency of it got another version in Directory.Packages.props (package-changes.sh), or its version in Versions.props did.
 set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/package-changes.sh"
 
 ZERO_SHA="0000000000000000000000000000000000000000"
 EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
@@ -25,7 +27,9 @@ for DIRECTORY in src/*/; do
   OLD_VERSION="$(git show "$BASE_SHA:Versions.props" 2>/dev/null | version_of "$PROPERTY" || true)"
   NEW_VERSION="$(git show "$HEAD_SHA:Versions.props" 2>/dev/null | version_of "$PROPERTY" || true)"
 
-  if [ "$SRC_CHANGED" = "true" ] || [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+  DEPENDENCIES_CHANGED="$(changed_dependencies "$BASE_SHA" "$HEAD_SHA" "$PACKAGE")"
+
+  if [ "$SRC_CHANGED" = "true" ] || [ -n "$DEPENDENCIES_CHANGED" ] || [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
     CHANGED+=("$PACKAGE")
   fi
 done

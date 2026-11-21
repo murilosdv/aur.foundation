@@ -41,7 +41,6 @@ Responses are cached for `HealthChecks:CacheSeconds`, so a burst of probes does 
 |---|---|---|
 | Each HTTP dependency that has a `HealthCheck` section | `AddStandardHealthChecks` ([HTTP dependencies](./http-dependencies.md)) | Per its `Critical` flag |
 | PostgreSQL (`SELECT 1`) | `services.AddPostgresHealthCheck(options)` ([Postgres](../entity-framework/postgres.md#health-check)) | Yes |
-| SQL Server (`SELECT 1`) | `services.AddSqlServerHealthCheck(options)` ([SQL Server](../entity-framework/sqlserver.md#health-check)) | Yes |
 
 Your own checks use the standard `IHealthCheck`; give them the tags below so the endpoints include them.
 

@@ -25,7 +25,7 @@ public sealed class Post : SoftDeletableEntity
 `Entity.Id` is a **version 7 `Guid` created by the application** (`Guid.CreateVersion7()`) when the object is constructed. Two consequences:
 
 - The id exists **before the insert**, so you can build a response, an event or related entities without a round trip.
-- Version 7 ids are time-ordered: ids created later sort later. In PostgreSQL that inserts at the right edge of the index. SQL Server needs more help, see [SQL Server](../entity-framework/sqlserver.md#guid-keys-and-the-clustered-index).
+- Version 7 ids are time-ordered: ids created later sort later. In PostgreSQL that inserts at the right edge of the index.
 
 ## Timestamps
 
