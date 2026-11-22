@@ -10,6 +10,6 @@ dotnet add package Aurore.Foundation.Core --prerelease
 
 Which package to pick: [Getting started](./getting-started.md#packages).
 
-## Versions before `1.0.0-preview.2`
+## Versions before `1.0.0-preview.3`
 
-`1.0.0-preview.1` of every package was on GitHub Packages, which needed a token even to read, and was never on nuget.org. Those versions were removed; use `1.0.0-preview.2` or later.
+`1.0.0-preview.1` and `1.0.0-preview.2` of every package were on GitHub Packages, which needed a token even to read, and were never on nuget.org. Those versions were removed; use `1.0.0-preview.3` or later.
