@@ -6,6 +6,46 @@ All notable changes to this project will be documented in this file.
 
 Read [the instructions file](./docs/instructions/changelog.md) to learn what and how to write here.
 
+## [AspNetCore-1.0.0-preview.4] - 2026-11-22
+
+### Changed
+
+- Internal: the project file is organized in a fixed order (properties, framework reference, internals visible to, packages, project references, files, usings). No change in behavior or public API.
+
+---
+
+## [Core-1.0.0-preview.4] - 2026-11-22
+
+### Changed
+
+- Internal: the project file is organized in a fixed order (properties, framework reference, internals visible to, packages, project references, files, usings). No change in behavior or public API.
+
+---
+
+## [Telemetry-1.0.0-preview.4] - 2026-11-22
+
+### Changed
+
+- Internal: the project file is organized in a fixed order (properties, framework reference, internals visible to, packages, project references, files, usings). No change in behavior or public API.
+
+---
+
+## [EntityFrameworkCore-1.0.0-preview.4] - 2026-11-22
+
+### Changed
+
+- Internal: the project file is organized in a fixed order (properties, framework reference, internals visible to, packages, project references, files, usings). No change in behavior or public API.
+
+---
+
+## [EntityFrameworkCore.Postgres-1.0.0-preview.4] - 2026-11-22
+
+### Changed
+
+- Internal: the project file is organized in a fixed order (properties, framework reference, internals visible to, packages, project references, files, usings). No change in behavior or public API.
+
+---
+
 ## [AspNetCore-1.0.0-preview.3] - 2026-11-22
 
 ### Added

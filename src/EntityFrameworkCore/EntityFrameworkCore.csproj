@@ -10,16 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore.Postgres" />
+    <InternalsVisibleTo Include="Aurore.Foundation.Tests.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore.Postgres" />
-    <InternalsVisibleTo Include="Aurore.Foundation.Tests.EntityFrameworkCore" />
   </ItemGroup>
 
 </Project>

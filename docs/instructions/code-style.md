@@ -19,6 +19,14 @@ The rule is **cohesion**: what exists only for one thing lives in that thing's f
 - **A declaration longer than 120 characters puts one parameter per line**, the closing parenthesis after the last one and the base list (`: Base<...>`) on its own indented line.
 - Check with `dotnet format Foundation.slnx --verify-no-changes`.
 
+## Project files, Makefiles and Dockerfiles
+
+The same order everywhere, top-down, so any file of these kinds reads like the others.
+
+- **Project file (`.csproj`):** one `PropertyGroup` (`Version` when the project has one, `AssemblyName`, `RootNamespace`, then the rest), then one `ItemGroup` each for `FrameworkReference`, `InternalsVisibleTo`, `PackageReference`, `ProjectReference`, files (`Content`) and `Using`. Items inside a group are in alphabetical order. A comment only where the reason is not obvious.
+- **Makefile:** `-include` first, `export` next, then the variables grouped under a one-line comment (project, dev-sbx, SonarQube, migrations), then `.PHONY`, then the targets in sections headed `## Section ##` (dev-sbx, SonarQube, tests, clean, migrations, database). A command that repeats is a variable.
+- **Dockerfile:** `syntax` line and `ARG` first, then the stages in order, each headed `## Stage: what it does ##` (restore, build, test, publish, runtime). The test stage does not run as root.
+
 ## Documentation
 
 Everything public has XML documentation ([XML documentation](./xml-docs.md)).

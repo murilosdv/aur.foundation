@@ -2,23 +2,29 @@
 
 ARG SOLUTION=Foundation.slnx
 
-FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
+## Restore: packages and tools, in a layer that only changes with the project files ##
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS restore
 ARG SOLUTION
 WORKDIR /src
 
-COPY global.json Directory.Build.props Directory.Packages.props Versions.props .editorconfig $SOLUTION ./
-COPY --parents src/*/*.csproj tests/*/*.csproj ./
-# The packages and the tool are not under /root, so the user of the test stage can read them.
+# Outside /root, so the user of the test stage can read them.
 ENV NUGET_PACKAGES=/opt/nuget
-RUN dotnet restore "$SOLUTION"
-
-RUN dotnet tool install --tool-path /opt/tools dotnet-reportgenerator-globaltool --version 5.*
 ENV PATH="$PATH:/opt/tools"
 
+COPY global.json Directory.Build.props Directory.Packages.props Versions.props .editorconfig $SOLUTION ./
+COPY --parents src/*/*.csproj tests/*/*.csproj ./
+RUN dotnet restore "$SOLUTION"
+RUN dotnet tool install --tool-path /opt/tools dotnet-reportgenerator-globaltool --version 5.*
+
+## Build: the sources ##
+FROM restore AS build
 COPY src/ src/
 COPY tests/ tests/
 
-# The script is written here, not tracked: compose would re-split the reportgenerator arguments on the ';' if passed as an entrypoint override.
+## Test: every test project, then the coverage report; not as root ##
+FROM build AS test
+
+# Written here, not tracked: compose would split the reportgenerator arguments on ';' if this were an entrypoint override.
 COPY <<'SCRIPT' run-tests.sh
 #!/usr/bin/env bash
 set -euo pipefail
@@ -37,11 +43,10 @@ reportgenerator \
 
 cat artifacts/coverage-report/Summary.txt
 SCRIPT
-RUN chmod +x run-tests.sh
 
-FROM build AS test
-# Not root: the tests need no privilege. uid 1000 (a user the image already has) is the user of the machine, so it can write to the mounted artifacts folder.
-RUN chown -R 1000:1000 /src /opt/nuget
+# uid 1000 is the user of the machine, so it can write to the mounted artifacts folder.
+RUN chmod +x run-tests.sh && chown -R 1000:1000 /src /opt/nuget
 ENV DOTNET_CLI_HOME=/tmp
 USER 1000:1000
+
 ENTRYPOINT ["./run-tests.sh"]

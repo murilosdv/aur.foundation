@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Version>$(CoreVersion)</Version>
@@ -10,12 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" />
-    <PackageReference Include="Humanizer.Core" />
+    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Aurore.Foundation.EntityFrameworkCore" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Humanizer.Core" />
   </ItemGroup>
 
 </Project>
