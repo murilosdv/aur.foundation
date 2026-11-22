@@ -1,16 +1,17 @@
 name: Publish package
 description: >
-  Pushes the packages in ./nupkg (made by pack-package) to a NuGet feed (GitHub Packages of the repository owner by default).
+  Pushes the packages in ./nupkg (made by pack-package) to a NuGet feed (nuget.org by default).
+  The symbol package (.snupkg) next to each one goes with it, so the package can be debugged.
   A version that already exists in the feed fails the step.
 
 inputs:
   api-key:
-    description: Key of the feed. For GitHub Packages, secrets.GITHUB_TOKEN with packages write permission.
+    description: Key of the feed. For nuget.org, the short-lived key that NuGet/login returns for the trusted publishing policy (its NUGET_API_KEY output).
     required: true
   source:
-    description: URL of the feed. Defaults to the GitHub Packages feed of the owner of the repository.
+    description: URL of the feed. Defaults to nuget.org.
     required: false
-    default: ""
+    default: https://api.nuget.org/v3/index.json
 
 runs:
   using: composite
@@ -19,5 +20,5 @@ runs:
       shell: bash
       env:
         API_KEY: ${{ inputs.api-key }}
-        SOURCE: ${{ inputs.source != '' && inputs.source || format('https://nuget.pkg.github.com/{0}/index.json', github.repository_owner) }}
-      run: dotnet nuget push "./nupkg/*.nupkg" --no-symbols --api-key "$API_KEY" --source "$SOURCE"
+        SOURCE: ${{ inputs.source }}
+      run: dotnet nuget push "./nupkg/*.nupkg" --api-key "$API_KEY" --source "$SOURCE"

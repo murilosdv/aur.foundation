@@ -1,13 +1,12 @@
 <Project>
     <PropertyGroup>
-        <CoreVersion>1.0.0-preview.2</CoreVersion>
-        <TelemetryVersion>1.0.0-preview.2</TelemetryVersion>
-        <AspNetCoreVersion>1.0.0-preview.2</AspNetCoreVersion>
-        <OpenApiVersion>1.0.0-preview.2</OpenApiVersion>
-        <OpenApiScalarVersion>1.0.0-preview.2</OpenApiScalarVersion>
-        <OpenApiSwaggerVersion>1.0.0-preview.2</OpenApiSwaggerVersion>
-        <EntityFrameworkCoreVersion>1.0.0-preview.2</EntityFrameworkCoreVersion>
-        <EntityFrameworkCorePostgresVersion>1.0.0-preview.2</EntityFrameworkCorePostgresVersion>
-        <EntityFrameworkCoreSqlServerVersion>1.0.0-preview.2</EntityFrameworkCoreSqlServerVersion>
+        <CoreVersion>1.0.0-preview.3</CoreVersion>
+        <TelemetryVersion>1.0.0-preview.3</TelemetryVersion>
+        <AspNetCoreVersion>1.0.0-preview.3</AspNetCoreVersion>
+        <OpenApiVersion>1.0.0-preview.3</OpenApiVersion>
+        <OpenApiScalarVersion>1.0.0-preview.3</OpenApiScalarVersion>
+        <OpenApiSwaggerVersion>1.0.0-preview.3</OpenApiSwaggerVersion>
+        <EntityFrameworkCoreVersion>1.0.0-preview.3</EntityFrameworkCoreVersion>
+        <EntityFrameworkCorePostgresVersion>1.0.0-preview.3</EntityFrameworkCorePostgresVersion>
     </PropertyGroup>
 </Project>

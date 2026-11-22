@@ -1,6 +1,6 @@
 name: Detect changed packages
 description: >
-  Lists the packages (folders under src) whose code or version in Versions.props changed between two commits, as a JSON array for a job matrix.
+  Lists the packages (folders under src) whose code, a dependency of them in Directory.Packages.props, or version in Versions.props changed between two commits, as a JSON array for a job matrix.
   The checkout must have the full history (fetch-depth: 0).
 
 inputs:

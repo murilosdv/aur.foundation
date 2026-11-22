@@ -85,7 +85,7 @@ The route name, the summary and the description can come from three places. Each
 
 Nothing set means the default. A property replaces the default. `WithName`, `WithSummary` or `WithDescription` in `Map` replace both, whatever the property says. The description has no default, so it is only present when set at level 2 or 3.
 
-Route names must stay unique whichever level sets them. The catalog checks the `Name` property while it is built; a name set with `WithName` only exists once ASP.NET builds the endpoints, so `MapStandardMinimalEndpoints` builds the endpoints and checks them before it returns, and the application does not start.
+Route names must stay unique whichever level sets them. The `Name` property alone may repeat (a `WithName` in `Map` can still make it unique), so the check cannot happen when the catalog is built: `MapStandardMinimalEndpoints` builds the endpoints, reads the final names and checks them before it returns, and the application does not start.
 
 ## Conventions stack
 
@@ -101,6 +101,8 @@ Each level only **adds**; the requirements of every level must all pass.
 
 Groups require an authenticated caller by default, so a **new endpoint fails closed**. Narrow it with `group.RequireScopes("api.write")` in `Configure` or per endpoint (all levels must pass; see [authentication](./authentication.md#requiring-roles-and-scopes)). Opt out with `RequireAuthorization => false` on the group or `.AllowAnonymous()` on the endpoint.
 
+Use `.RequireJwtBearerAuthentication()` or `.RequireApiKeyAuthentication()` in a group's `Configure` or an endpoint's mapping chain to select one authentication scheme, then add role/scope requirements. The helpers live in `Authentication.Extensions`; see [scheme selection](./authentication.md#pinning-a-scheme).
+
 ### Documented problems
 
 `MinimalApiConfiguration.StandardProblems` documents `401`, `403`, `429` and `500` on **every** endpoint (the `400` validation problem, with its `errors` dictionary, is documented separately), once for the whole API. Pass your own list to replace them:
@@ -110,6 +112,8 @@ app.MapStandardMinimalEndpoints(endpoints, globalProblems: [401, 403, 429, 503])
 ```
 
 Add more per group (`Problems`) or per endpoint (`.ProducesProblem(404)`).
+
+Do not repeat `.ProducesValidationProblem()` on standard minimal endpoints: the API group already declares the 400 validation response. Standalone routes outside `MapStandardMinimalEndpoints` must declare their own response metadata.
 
 Paged endpoints use `.ProducesPage<T>()` / `.ProducesCursorPage<T>()` ([pagination](../core/pagination.md)).
 

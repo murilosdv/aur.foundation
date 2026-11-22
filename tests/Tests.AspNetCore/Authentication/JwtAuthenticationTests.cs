@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Aurore.Foundation.AspNetCore.Authentication.Configuration;
+using Aurore.Foundation.AspNetCore.Authentication.Constants;
 using Aurore.Foundation.AspNetCore.Authentication.Extensions;
 using Aurore.Foundation.Core.Authentication.Models;
 using Aurore.Foundation.Tests.Shared.Hosting;
@@ -29,6 +30,7 @@ namespace Aurore.Foundation.Tests.AspNetCore.Authentication;
 public sealed class JwtAuthenticationTests : IAsyncLifetime
 {
     private const string Issuer = "https://idp.example.com/realms/test";
+    private const string ApiKey = "scheme-selection-test-key";
 
     private static readonly SymmetricSecurityKey _key = new(Encoding.UTF8.GetBytes("a-local-key-only-for-these-tests-0123456789"));
 
@@ -41,7 +43,13 @@ public sealed class JwtAuthenticationTests : IAsyncLifetime
         _app = await TestApp.StartAsync(
             builder =>
             {
-                builder.Services.AddStandardAuthConfiguration(identity, new ApiKeysOptions());
+                builder.Services.AddStandardAuthConfiguration(identity, new ApiKeysOptions
+                {
+                    Clients = new Dictionary<string, ApiKeyClientOptions>
+                    {
+                        ["test-client"] = new() { Key = ApiKey, Roles = ["reader"] }
+                    }
+                });
                 builder.Services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.Configuration = new OpenIdConnectConfiguration { Issuer = Issuer };
@@ -56,6 +64,12 @@ public sealed class JwtAuthenticationTests : IAsyncLifetime
                 app.MapGet("/authenticated", () => "ok").RequireAuthorization();
                 app.MapGet("/scope", () => "ok").RequireScopes("api.read");
                 app.MapGet("/role", () => "ok").RequireRoles("admin");
+                app.MapGet("/bearer-only", () => "ok").RequireJwtBearerAuthentication();
+                app.MapGet("/key-only", () => "ok").RequireApiKeyAuthentication().RequireRoles("reader");
+                app.MapGroup("/bearer-group").RequireJwtBearerAuthentication()
+                    .MapGet("/read", () => "ok").RequireScopes("api.read");
+                app.MapGroup("/key-group").RequireApiKeyAuthentication()
+                    .MapGet("/read", () => "ok").RequireRoles("reader");
                 app.MapGet("/me", (ClaimsPrincipal user) => new
                 {
                     Subject = user.GetUserId(),
@@ -76,6 +90,35 @@ public sealed class JwtAuthenticationTests : IAsyncLifetime
         { "/scope", HttpStatusCode.OK }, // the token has api.read
         { "/role", HttpStatusCode.Forbidden }, // the token has no admin role
     };
+
+    public static TheoryData<string, bool, bool, HttpStatusCode> SchemeAccess => new()
+    {
+        { "/bearer-only", true, false, HttpStatusCode.OK },
+        { "/bearer-only", false, true, HttpStatusCode.Unauthorized },
+        { "/bearer-only", false, false, HttpStatusCode.Unauthorized },
+        { "/key-only", false, true, HttpStatusCode.OK },
+        { "/key-only", true, false, HttpStatusCode.Unauthorized },
+        { "/key-only", false, false, HttpStatusCode.Unauthorized },
+        { "/bearer-group/read", true, false, HttpStatusCode.OK },
+        { "/bearer-group/read", false, true, HttpStatusCode.Unauthorized },
+        { "/key-group/read", false, true, HttpStatusCode.OK },
+        { "/key-group/read", true, false, HttpStatusCode.Unauthorized },
+    };
+
+    [Theory(DisplayName = "Scheme helpers enforce credential selection on endpoints and resource groups")]
+    [MemberData(nameof(SchemeAccess))]
+    public async Task SchemeHelpersEnforceCredentialSelection(string path, bool bearer, bool apiKey, HttpStatusCode expected)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        if (bearer)
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token());
+        if (apiKey)
+            request.Headers.Add(ApiKeyDefaults.HeaderName, ApiKey);
+
+        using var response = await _app.Client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Equal(expected, response.StatusCode);
+    }
 
     [Theory(DisplayName = "A valid token opens the endpoints its roles and scopes allow, and no others")]
     [MemberData(nameof(Access))]

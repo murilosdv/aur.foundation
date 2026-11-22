@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Aurore.Foundation.Core.Features.Attributes;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,7 @@ public static class FeatureConfiguration
         return services;
     }
 
+    [SuppressMessage("Major Code Smell", "S3267:Loops should be simplified with LINQ expressions", Justification = "The check reads the list that the loop is filling")]
     private static Type[] DecoratorsOf(Type feature, IReadOnlyList<Type> enabledForAll)
     {
         var decorators = new List<Type>(enabledForAll);
@@ -59,7 +61,7 @@ public static class FeatureConfiguration
         return [.. decorators];
     }
 
-    private static object Create(IServiceProvider provider, Type feature, Type[] decorators)
+    private static FeatureBase Create(IServiceProvider provider, Type feature, Type[] decorators)
     {
         var instance = (FeatureBase)ActivatorUtilities.CreateInstance(provider, feature);
 

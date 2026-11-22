@@ -12,7 +12,7 @@ This page builds a service from nothing and shows where each package plugs in. T
 | An HTTP service: authentication, request pipeline, endpoints, health, HTTP clients | `Aurore.Foundation.AspNetCore` |
 | OpenAPI documents (and a UI) | `Aurore.Foundation.OpenApi`, plus `…OpenApi.Scalar` or `…OpenApi.Swagger` |
 | Logs, metrics and traces | `Aurore.Foundation.Telemetry` |
-| A database | `Aurore.Foundation.EntityFrameworkCore.Postgres` or `…SqlServer` (each brings `…EntityFrameworkCore`) |
+| A database | `Aurore.Foundation.EntityFrameworkCore.Postgres` (brings `…EntityFrameworkCore`) |
 
 Business code (features, entities, errors) should reference **only Core** and the EF package, so it stays free of ASP.NET Core and can run in a worker or a test.
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace Aurore.Foundation.AspNetCore.RequestPipeline.Filters;
 /// </summary>
 internal static class RequestValidationFilter
 {
+    [SuppressMessage("Major Code Smell", "S3011:Reflection should not be used to increase accessibility of classes, methods, or fields", Justification = "The method is private and ours, looked up once and cached as a delegate per type")]
     private static readonly MethodInfo _validateMethod = typeof(RequestValidationFilter)
         .GetMethod(nameof(ValidateAsync), BindingFlags.NonPublic | BindingFlags.Static)!;
 

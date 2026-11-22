@@ -11,7 +11,7 @@ namespace Aurore.Foundation.EntityFrameworkCore.Features;
 /// </summary>
 public sealed class UniqueViolationMap
 {
-    private readonly Dictionary<string, ApplicationError> _errors = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ApplicationError> _errors = [with(StringComparer.Ordinal)];
 
     /// <summary>
     /// Answers a violation of the constraint with the error.

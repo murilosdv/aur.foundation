@@ -13,42 +13,38 @@ using Microsoft.AspNetCore.Http;
 namespace Aurore.Foundation.Tests.AspNetCore.RequestPipeline.Middlewares;
 
 [Trait("Feature", "Request context")]
-public sealed class RequestContextMiddlewareTests
+public sealed partial class RequestContextMiddlewareTests
 {
-    public static TheoryData<string> CorrelationIdsInRange => new()
-    {
+    public static TheoryData<string> CorrelationIdsInRange => [
         new string('a', 12),
         "0f8fad5b-d9cb-469f-a165-70867728950e",
         "4bf92f3577b34da6a3ce929d0e0e4736",
         new string('c', 64),
-    };
+    ];
 
-    public static TheoryData<string> IgnoredCorrelationIds => new()
-    {
+    public static TheoryData<string> IgnoredCorrelationIds => [
         "X",
         new string('a', 11),
         new string('a', 65),
         "has spaces in it",
         "semi;colon;value",
-    };
+    ];
 
-    public static TheoryData<string> IdempotencyKeysInRange => new()
-    {
+    public static TheoryData<string> IdempotencyKeysInRange => [
         new string('a', 12),
         "0f8fad5b-d9cb-469f-a165-70867728950e",
         "order.2026_11-0001",
         new string('k', 128),
-    };
+    ];
 
-    public static TheoryData<string> RefusedIdempotencyKeys => new()
-    {
+    public static TheoryData<string> RefusedIdempotencyKeys => [
         "X",
         new string('a', 11),
         new string('a', 129),
         "bad key with spaces",
         "bad-key-with-symbol!",
         "chave-com-acentuação",
-    };
+    ];
 
     [Fact(DisplayName = "The Correlation-Id header wins over X-Request-ID")]
     public async Task CorrelationIdHeaderWins()
@@ -155,7 +151,7 @@ public sealed class RequestContextMiddlewareTests
         var run = await Run(http);
 
         // Assert
-        Assert.Equal(Regex.IsMatch(value, RequestContextMiddleware.CorrelationIdPattern), run.Context.CorrelationId == value);
+        Assert.Equal(CorrelationIdRegex().IsMatch(value), run.Context.CorrelationId == value);
     }
 
     [Fact(DisplayName = "The context captures the client address, user agent and host")]
@@ -249,7 +245,7 @@ public sealed class RequestContextMiddlewareTests
         var run = await Run(http);
 
         // Assert
-        Assert.Equal(run.NextCalled, Regex.IsMatch(key, RequestContextMiddleware.IdempotencyKeyPattern));
+        Assert.Equal(run.NextCalled, IdempotencyKeyRegex().IsMatch(key));
     }
 
     [Fact(DisplayName = "With privacy off the log scope carries the real client address and user agent")]
@@ -310,4 +306,10 @@ public sealed class RequestContextMiddlewareTests
     }
 
     private sealed record RunResult(RequestContext Context, Dictionary<string, object?> Scope, bool NextCalled);
+
+    [GeneratedRegex(RequestContextMiddleware.CorrelationIdPattern)]
+    private static partial Regex CorrelationIdRegex();
+
+    [GeneratedRegex(RequestContextMiddleware.IdempotencyKeyPattern)]
+    private static partial Regex IdempotencyKeyRegex();
 }

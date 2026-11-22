@@ -5,7 +5,7 @@ description: >
 
 inputs:
   services:
-    description: Space separated names from docker-compose.yaml next to this file (postgres, sqlserver). Empty starts nothing.
+    description: Space separated names from docker-compose.yaml next to this file (postgres). Empty starts nothing.
     required: true
 
 runs:

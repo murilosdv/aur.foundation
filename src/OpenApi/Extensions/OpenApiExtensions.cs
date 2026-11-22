@@ -239,14 +239,20 @@ public static class OpenApiExtensions
     {
         return options.AddOperationTransformer((operation, _, _) =>
         {
-            foreach (var parameter in operation.Parameters?.OfType<OpenApiParameter>() ?? [])
+            var parameters = operation.Parameters?.OfType<OpenApiParameter>() ?? [];
+
+            foreach (var parameter in parameters.Where(IsNamedQueryParameter))
             {
-                if (parameter.In is ParameterLocation.Query && parameter.Name.HasValue())
-                    parameter.Name = parameter.Name.ToCamelCase();
+                parameter.Name = parameter.Name.ToCamelCase();
             }
 
             return Task.CompletedTask;
         });
+
+        static bool IsNamedQueryParameter(OpenApiParameter parameter)
+        {
+            return parameter.In is ParameterLocation.Query && parameter.Name.HasValue();
+        }
     }
 
     /// <summary>
@@ -277,7 +283,7 @@ public static class OpenApiExtensions
                         Pattern = RequestContextMiddleware.IdempotencyKeyPattern,
                         MinLength = RequestContextMiddleware.MinIdempotencyKeyLength,
                         MaxLength = RequestContextMiddleware.MaxIdempotencyKeyLength,
-                        Examples = [JsonValue.Create(Guid.NewGuid().ToString())!]
+                        Examples = [JsonValue.Create(Guid.NewGuid().ToString())]
                     },
                     Description = $"Idempotency Key for request idempotence. Letters, digits, '.', '_' and '-', {RequestContextMiddleware.MinIdempotencyKeyLength} to {RequestContextMiddleware.MaxIdempotencyKeyLength} characters."
                 });
@@ -294,33 +300,27 @@ public static class OpenApiExtensions
     {
         return options.AddDocumentTransformer((document, _, _) =>
         {
-            foreach (var pathItem in document.Paths.Values)
+            foreach (var operation in document.Paths.Values.SelectMany(x => (IEnumerable<OpenApiOperation>?)x.Operations?.Values ?? []))
             {
-                if (pathItem.Operations is null)
-                    continue;
+                operation.Parameters ??= [];
 
-                foreach (var operation in pathItem.Operations.Values)
+                if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.CorrelationId))
                 {
-                    operation.Parameters ??= [];
-
-                    if (operation.Parameters.All(p => p.Name is not CustomHeaderNames.CorrelationId))
+                    operation.Parameters.Add(new OpenApiParameter
                     {
-                        operation.Parameters.Add(new OpenApiParameter
+                        Name = CustomHeaderNames.CorrelationId,
+                        In = ParameterLocation.Header,
+                        Required = false,
+                        Schema = new OpenApiSchema
                         {
-                            Name = CustomHeaderNames.CorrelationId,
-                            In = ParameterLocation.Header,
-                            Required = false,
-                            Schema = new OpenApiSchema
-                            {
-                                Type = JsonSchemaType.String,
-                                Pattern = RequestContextMiddleware.CorrelationIdPattern,
-                                MinLength = RequestContextMiddleware.MinCorrelationIdLength,
-                                MaxLength = RequestContextMiddleware.MaxCorrelationIdLength,
-                                Examples = [JsonValue.Create(Guid.NewGuid().ToString())!]
-                            },
-                            Description = $"Correlation Id for request tracking and tracing. Letters, digits, '.', '_' and '-', {RequestContextMiddleware.MinCorrelationIdLength} to {RequestContextMiddleware.MaxCorrelationIdLength} characters; a new one is generated when missing or invalid."
-                        });
-                    }
+                            Type = JsonSchemaType.String,
+                            Pattern = RequestContextMiddleware.CorrelationIdPattern,
+                            MinLength = RequestContextMiddleware.MinCorrelationIdLength,
+                            MaxLength = RequestContextMiddleware.MaxCorrelationIdLength,
+                            Examples = [JsonValue.Create(Guid.NewGuid().ToString())]
+                        },
+                        Description = $"Correlation Id for request tracking and tracing. Letters, digits, '.', '_' and '-', {RequestContextMiddleware.MinCorrelationIdLength} to {RequestContextMiddleware.MaxCorrelationIdLength} characters; a new one is generated when missing or invalid."
+                    });
                 }
             }
 

@@ -18,7 +18,7 @@ on:
         required: true
         type: string
       publish:
-        description: Push to GitHub Packages after a successful verify. False for pull requests.
+        description: Push to nuget.org after a successful verify. False for pull requests.
         required: false
         type: boolean
         default: true
@@ -28,7 +28,7 @@ on:
         type: boolean
         default: false
       skip-version-sync:
-        description: Bypass the "src and Versions.props change together" check. Only set by the manual run of the publish workflow.
+        description: Bypass the "the package and its version change together" check. Only set by the manual run of the publish workflow.
         required: false
         type: boolean
         default: false
@@ -55,7 +55,7 @@ jobs:
       - name: Start the servers the tests need
         uses: ./.github/actions/start-services
         with:
-          services: ${{ inputs.package-name == 'EntityFrameworkCore.Postgres' && 'postgres' || inputs.package-name == 'EntityFrameworkCore.SqlServer' && 'sqlserver' || '' }}
+          services: ${{ inputs.package-name == 'EntityFrameworkCore.Postgres' && 'postgres' || '' }}
 
       - name: Build and test
         uses: ./.github/actions/build-test
@@ -90,6 +90,7 @@ jobs:
           name: package-${{ inputs.package-name }}
           path: |
             nupkg/*.nupkg
+            nupkg/*.snupkg
             published/${{ inputs.package-name }}.txt
           if-no-files-found: error
 
@@ -98,6 +99,12 @@ jobs:
     needs: verify
     if: inputs.publish == true
     runs-on: ubuntu-latest
+    # The trusted publishing policy on nuget.org is for the repository, the workflow publish.yaml and the environment production, so the token of any other workflow or environment is refused.
+    # id-token: write is what lets the job ask GitHub for that token.
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,10 +114,16 @@ jobs:
         with:
           name: package-${{ inputs.package-name }}
 
+      - name: Log in to nuget.org (trusted publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: muriloalmeidadev
+
       - name: Publish
         uses: ./.github/actions/publish-package
         with:
-          api-key: ${{ secrets.GITHUB_TOKEN }}
+          api-key: ${{ steps.login.outputs.NUGET_API_KEY }}
 
       - name: Upload the record
         uses: actions/upload-artifact@v4

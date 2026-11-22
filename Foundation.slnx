@@ -5,6 +5,7 @@
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
     <File Path="Versions.props" />
     <File Path="global.json" />
     <File Path="Dockerfile" />
@@ -17,7 +18,6 @@
     <Project Path="tests/Tests.Core/Tests.Core.csproj" />
     <Project Path="tests/Tests.EntityFrameworkCore/Tests.EntityFrameworkCore.csproj" />
     <Project Path="tests/Tests.EntityFrameworkCore.Postgres/Tests.EntityFrameworkCore.Postgres.csproj" />
-    <Project Path="tests/Tests.EntityFrameworkCore.SqlServer/Tests.EntityFrameworkCore.SqlServer.csproj" />
     <Project Path="tests/Tests.OpenApi/Tests.OpenApi.csproj" />
     <Project Path="tests/Tests.OpenApi.Scalar/Tests.OpenApi.Scalar.csproj" />
     <Project Path="tests/Tests.OpenApi.Swagger/Tests.OpenApi.Swagger.csproj" />
@@ -33,6 +33,5 @@
   <Project Path="src/OpenApi.Swagger/OpenApi.Swagger.csproj" />
   <Project Path="src/EntityFrameworkCore/EntityFrameworkCore.csproj" />
   <Project Path="src/EntityFrameworkCore.Postgres/EntityFrameworkCore.Postgres.csproj" />
-  <Project Path="src/EntityFrameworkCore.SqlServer/EntityFrameworkCore.SqlServer.csproj" />
   <Project Path="src/Telemetry/Telemetry.csproj" />
 </Solution>

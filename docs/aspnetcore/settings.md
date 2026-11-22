@@ -36,7 +36,7 @@ public sealed record AppSettings
 | `HealthChecks` | `HealthChecksOptions` | [Health checks](./health-checks.md) |
 | `HttpDependencies` | dictionary of `HttpDependencyOptions` | [HTTP dependencies](./http-dependencies.md) |
 | `Telemetry` | `TelemetryOptions` | [Telemetry](../telemetry/README.md) |
-| `Postgres` / `SqlServer` | `PostgresOptions` / `SqlServerOptions` | [Postgres](../entity-framework/postgres.md), [SQL Server](../entity-framework/sqlserver.md) |
+| `Postgres` | `PostgresOptions` | [Postgres](../entity-framework/postgres.md) |
 
 ## `GetStrict<T>()`
 
@@ -91,7 +91,7 @@ new AppSettingsValidator(builder.Environment).ValidateAndThrow(appSettings);
 | `RequestPipelineOptionsValidator()` | (same everywhere) |
 | `TelemetryOptionsValidator(isProduction)` | No local collector endpoint. |
 | `HttpDependencyOptionsValidator(isProduction)` | No local base or token URL. |
-| `PostgresOptionsValidator(isProduction)` / `SqlServerOptionsValidator(isProduction)` | No local host; SQL Server requires encryption and a validated certificate. |
+| `PostgresOptionsValidator(isProduction)` | No local host in production. |
 | `PaginationOptionsValidator()` | (same everywhere) |
 
 These validators are plain FluentValidation validators. They are **not** registered in the container: create them by hand at startup (`AddStandardValidators` skips them on purpose).

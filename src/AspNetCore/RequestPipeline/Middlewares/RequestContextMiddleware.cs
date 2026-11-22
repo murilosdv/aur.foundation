@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Aurore.Foundation.AspNetCore.Constants;
 using Aurore.Foundation.AspNetCore.Extensions;
@@ -91,13 +92,9 @@ internal sealed class RequestContextMiddleware(
         if (value.Length < minLength || value.Length > maxLength)
             return null;
 
-        foreach (var c in value)
-        {
-            if (char.IsAsciiLetterOrDigit(c) is false && c is not ('-' or '_' or '.'))
-                return null;
-        }
-
-        return value;
+        return value.Any(c => char.IsAsciiLetterOrDigit(c) is false && c is not ('-' or '_' or '.'))
+            ? null
+            : value;
     }
 
     private static string? Truncate(string? value)

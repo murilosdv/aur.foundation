@@ -6,6 +6,100 @@ All notable changes to this project will be documented in this file.
 
 Read [the instructions file](./docs/instructions/changelog.md) to learn what and how to write here.
 
+## [AspNetCore-1.0.0-preview.3] - 2026-11-22
+
+### Added
+
+- `RequireJwtBearerAuthentication()` and `RequireApiKeyAuthentication()` select one registered authentication scheme on an endpoint or a resource group, and compose with the role and scope helpers.
+
+### Fixed
+
+- A replayed idempotent response stops when the client has already gone away, instead of writing to a closed connection.
+- Two endpoints with the same final name, set with `WithName` or the `Name` property, stop the application from starting. A `WithName` duplicate used to start fine and answer 500 on the first request, and a repeated `Name` property was rejected even when `WithName` made the names unique.
+- Endpoints named by default or by the `Name` property now also carry the route name metadata, so link generation finds them.
+
+### Changed
+
+- Internal: a few loops written with LINQ, an unnecessary array and a null-forgiving operator removed, and the sort field is an interface. No change in behavior.
+- The parameter of `UnexpectedExceptionHandler.TryHandleAsync` is named `httpContext`, as in `IExceptionHandler`.
+- The default API version is no longer set explicitly: 1.0 is already the default. No change in behavior.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [Core-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Internal: a few loops written with LINQ, an unnecessary array and a null-forgiving operator removed, and the sort field is an interface. No change in behavior.
+- The validator interfaces `IRequestValidator<T>` and `IFeatureValidator<T>` are contravariant (`in T`): a validator of a base type can be used where a validator of a derived type is expected. Registrations and resolution are not affected.
+- Internal: the validator of the request pipeline settings has one method per section, instead of one long constructor. Same checks, same messages.
+- Internal: the cancellation token is the last parameter of the feature pipeline entry, `Keyset` and the feature registration return their narrower types, and the dictionaries with a comparer use collection expressions. No change in behavior or public API.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [OpenApi-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Internal: a few loops written with LINQ, an unnecessary array and a null-forgiving operator removed, and the sort field is an interface. No change in behavior.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [OpenApi.Scalar-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Internal: a few loops written with LINQ, an unnecessary array and a null-forgiving operator removed, and the sort field is an interface. No change in behavior.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [OpenApi.Swagger-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [Telemetry-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Internal: the startup line is written by a source-generated logger message, so its arguments are not evaluated when the level is off. No change in behavior.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [EntityFrameworkCore-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Internal: a few loops written with LINQ, an unnecessary array and a null-forgiving operator removed, and the sort field is an interface. No change in behavior.
+- Internal: the unique violation answer shares one message array instead of creating one per field, and the map uses a collection expression. No change in behavior or public API.
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
+## [EntityFrameworkCore.Postgres-1.0.0-preview.3] - 2026-11-22
+
+### Changed
+
+- Package metadata: a README of its own on nuget.org (with absolute links), a release notes link, the copyright line as in the license, and the symbol package pushed with it.
+- NuGet versions of the dependencies moved to `Directory.Packages.props` (central package management); same versions, same package dependencies.
+
+---
+
 ## [AspNetCore-1.0.0-preview.2] - 2026-11-18
 
 ### Fixed
@@ -75,14 +169,6 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 
 ---
 
-## [EntityFrameworkCore.SqlServer-1.0.0-preview.2] - 2026-11-18
-
-### Changed
-
-- Internal cleanup, no change in behavior or public API: long signatures wrapped, and `WithUniqueViolationAttribute` and `SqlServerHealthCheck` in files of their own, in the same namespaces.
-
----
-
 ## [Core-1.0.0-preview.1] - 2026-11-15
 
 ### Added
@@ -146,9 +232,3 @@ Read [the instructions file](./docs/instructions/changelog.md) to learn what and
 - The PostgreSQL provider: Npgsql registration, snake case history table, partial indexes, a decorator that answers unique violations with a conflict and a health check.
 
 ---
-
-## [EntityFrameworkCore.SqlServer-1.0.0-preview.1] - 2026-11-15
-
-### Added
-
-- The SQL Server provider: clustering on a sequential column for Guid keys (`UseSequentialClusteredIndex`), SqlClient registration, filtered indexes, column helpers, a decorator that answers duplicate key errors with a conflict (needs the server messages in English) and a health check.

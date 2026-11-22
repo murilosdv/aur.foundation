@@ -8,6 +8,9 @@ namespace Aurore.Foundation.EntityFrameworkCore.Errors;
 
 internal static class UniqueViolationErrors
 {
+    // One array for every field: the details are only read when the answer is written.
+    private static readonly string[] _alreadyExists = ["A record with this value already exists."];
+
     internal static ApplicationError Describe(DbUpdateException exception, string? constraintName)
     {
         if (constraintName is null)
@@ -24,6 +27,6 @@ internal static class UniqueViolationErrors
 
         return fields.Count is 0
             ? DatabaseErrors.Conflict
-            : DatabaseErrors.Conflict.WithDetails(fields.ToDictionary(field => field, _ => new[] { "A record with this value already exists." }));
+            : DatabaseErrors.Conflict.WithDetails(fields.ToDictionary(field => field, _ => _alreadyExists));
     }
 }

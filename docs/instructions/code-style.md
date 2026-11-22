@@ -14,7 +14,7 @@ The rule is **cohesion**: what exists only for one thing lives in that thing's f
 
 ## Code
 
-- **Pattern matching wherever it applies:** a `switch` for an `if` / `else if` / `else` on one value, and `is` / `is not` against constants (`Count is 0`, `x is not "*"`). Not possible against `static readonly` values (`Uri.UriSchemeHttps`) or inside an EF expression tree.
+- **Pattern matching wherever it applies:** a `switch` for an `if` / `else if` / `else` on one value, and `is` / `is not` against constants (`Count is 0`, `x is not "*"`). Not possible against `static readonly` values (`Uri.UriSchemeHttps`) or inside an EF expression tree. A negative test is `is false`, never `!`: `Contains(x) is false`. SonarQube rule S1125 (unnecessary Boolean literal) would flag these, so it is off in `.editorconfig`.
 - **No braces around a body of one line** (`if`, `else`, `foreach`, `while`); braces when it spans lines. Keep the braces on every branch of an `if` / `else` chain that has a braced branch. IDE0011 only asks for missing braces, so leaving redundant ones out is on you.
 - **A declaration longer than 120 characters puts one parameter per line**, the closing parenthesis after the last one and the base list (`: Base<...>`) on its own indented line.
 - Check with `dotnet format Foundation.slnx --verify-no-changes`.

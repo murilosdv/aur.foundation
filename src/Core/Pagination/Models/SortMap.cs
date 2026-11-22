@@ -28,7 +28,7 @@ public static class SortMap
 /// <summary>
 /// One ordering of a plan: what to order by and in which direction.
 /// </summary>
-internal sealed record SortStep<T>(SortItem Item, SortField<T> Field);
+internal sealed record SortStep<T>(SortItem Item, ISortField<T> Field);
 
 /// <summary>
 /// The fields a list may be ordered by, declared once per entity on the feature side: the name a client sends and the
@@ -39,9 +39,9 @@ internal sealed record SortStep<T>(SortItem Item, SortField<T> Field);
 /// <typeparam name="T">The type being listed. Its primary key is the property named Id.</typeparam>
 public sealed class SortMap<T>
 {
-    private static readonly Lazy<SortField<T>?> _id = new(BuildIdField);
+    private static readonly Lazy<ISortField<T>?> _id = new(BuildIdField);
 
-    private readonly Dictionary<string, SortField<T>> _fields = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ISortField<T>> _fields = [with(StringComparer.OrdinalIgnoreCase)];
     private readonly List<SortItem> _default = [];
 
     internal SortMap()
@@ -165,7 +165,7 @@ public sealed class SortMap<T>
         return name;
     }
 
-    private static SortField<T>? BuildIdField()
+    private static ISortField<T>? BuildIdField()
     {
         var property = typeof(T).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
 
@@ -175,6 +175,6 @@ public sealed class SortMap<T>
         var parameter = Expression.Parameter(typeof(T), "x");
         var lambda = Expression.Lambda(Expression.Property(parameter, property), parameter);
 
-        return (SortField<T>)Activator.CreateInstance(typeof(SortField<,>).MakeGenericType(typeof(T), property.PropertyType), lambda)!;
+        return (ISortField<T>)Activator.CreateInstance(typeof(SortField<,>).MakeGenericType(typeof(T), property.PropertyType), lambda)!;
     }
 }

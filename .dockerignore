@@ -6,3 +6,8 @@
 artifacts/
 nupkg/
 *.user
+**/.env
+**/.env.*
+**/secrets.yml
+**/secrets.yaml
+**/secrets.json

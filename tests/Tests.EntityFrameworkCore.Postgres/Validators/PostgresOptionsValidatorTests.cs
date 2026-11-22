@@ -9,7 +9,7 @@ namespace Aurore.Foundation.Tests.EntityFrameworkCore.Postgres.Validators;
 [Trait("Category", "Unit")]
 public sealed class PostgresOptionsValidatorTests
 {
-    public static TheoryData<string> RequiredKeywords => new() { "Host", "Database", "Username", "Password" };
+    public static TheoryData<string> RequiredKeywords => ["Host", "Database", "Username", "Password"];
 
     public static TheoryData<string, string> InvalidSettings => new()
     {

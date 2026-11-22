@@ -1,6 +1,6 @@
 name: Check package/version sync
 description: >
-  Reads the version of a package from Versions.props and fails unless a change under src/<Package> and a change of that version happen in the same diff,
+  Reads the version of a package from Versions.props and fails unless a change under src/<Package> or of a dependency of it in Directory.Packages.props, and a change of that version, happen in the same diff,
   and CHANGELOG.md has the first entry "## [<Package>-<version>]" of the package for that version, once.
   Used by the pull request check and by the publish pipeline, so the rule is defined once.
 

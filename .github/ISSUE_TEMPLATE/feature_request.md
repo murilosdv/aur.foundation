@@ -7,7 +7,7 @@ labels: enhancement
 
 ## Package
 
-<!-- Which package(s): Core, AspNetCore, OpenApi, OpenApi.Scalar, OpenApi.Swagger, Telemetry, EntityFrameworkCore, EntityFrameworkCore.Postgres, EntityFrameworkCore.SqlServer, or a new one -->
+<!-- Which package(s): Core, AspNetCore, OpenApi, OpenApi.Scalar, OpenApi.Swagger, Telemetry, EntityFrameworkCore, EntityFrameworkCore.Postgres, or a new one -->
 
 ## Problem
 

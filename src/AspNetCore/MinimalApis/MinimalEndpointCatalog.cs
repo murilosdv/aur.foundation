@@ -80,24 +80,8 @@ public sealed class MinimalEndpointCatalog
         }
 
         ValidateSharedVersions(resources);
-        ValidateUniqueRouteNames(resources);
 
         return new MinimalEndpointCatalog(resources);
-    }
-
-    /// <summary>
-    /// Route names are global to the app (they identify endpoints for link generation and in the API documents).
-    /// </summary>
-    private static void ValidateUniqueRouteNames(List<ResourceEndpoints> resources)
-    {
-        var endpoints = resources.SelectMany(x => x.Endpoints).ToList();
-
-        if (endpoints.GroupBy(x => x.RouteName, StringComparer.Ordinal).FirstOrDefault(x => x.Count() > 1) is not { } duplicate)
-            return;
-
-        var types = string.Join(", ", duplicate.Select(x => x.GetType().Name));
-
-        throw new InvalidOperationException($"Endpoints [{types}] share the route name '{duplicate.Key}'. Override Name on one of them to make it unique.");
     }
 
     private static MinimalEndpointVersion Merge(IGrouping<int, MinimalEndpointVersion> versions)

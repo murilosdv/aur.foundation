@@ -21,7 +21,7 @@ public static class AuthenticationConfiguration
     /// JWT Bearer (Authorization: Bearer &lt;token&gt;) always; API keys too when at least one client is configured.
     /// With both, every RequireAuthorization()/RequireScopes()/RequireRoles() accepts either kind of caller. Roles from the
     /// token are normalized to standard role claims according to IdentityProviderOptions.Provider.
-    /// Pin one with policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme or ApiKeyDefaults.AuthenticationScheme).
+    /// Pin one with RequireJwtBearerAuthentication() or RequireApiKeyAuthentication() on the endpoint or group.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="identityProvider">The identity provider that issues the tokens: authority, audience, provider kind and clock skew.</param>

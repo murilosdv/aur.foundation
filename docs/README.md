@@ -58,7 +58,6 @@ Logs, metrics and traces over OTLP: every setting, what is collected, custom met
 | [Unique violations](./entity-framework/unique-violations.md) | Answering duplicates with a conflict; the constraint map. |
 | [Migrations](./entity-framework/migrations.md) | The tools project and the design-time factory. |
 | [PostgreSQL](./entity-framework/postgres.md) | Connection settings, partial indexes, health check. |
-| [SQL Server](./entity-framework/sqlserver.md) | Connection settings, clustered Guid keys, filtered indexes, health check. |
 
 ## Instructions
 

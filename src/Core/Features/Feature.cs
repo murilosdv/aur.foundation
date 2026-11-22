@@ -24,7 +24,7 @@ public abstract class Feature<TRequest> : FeatureBase
         if (Pipeline is null)
             return await ExecuteAsync(request, cancellationToken);
 
-        return await RunAsync(typeof(TRequest), request, cancellationToken, async () => await ExecuteAsync(request, cancellationToken));
+        return await RunAsync(typeof(TRequest), request, async () => await ExecuteAsync(request, cancellationToken), cancellationToken);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public abstract class Feature<TRequest, TResponse> : FeatureBase
         if (Pipeline is null)
             return await ExecuteAsync(request, cancellationToken);
 
-        var result = await RunAsync(typeof(TRequest), request, cancellationToken, async () => await ExecuteAsync(request, cancellationToken));
+        var result = await RunAsync(typeof(TRequest), request, async () => await ExecuteAsync(request, cancellationToken), cancellationToken);
 
         // A decorator that answers on its own returns a plain failure; give it the type of this feature's result.
         return result as Result<TResponse> ?? Result<TResponse>.Failure(result.Error!);

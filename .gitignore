@@ -7,6 +7,13 @@
 
 # dotenv files
 .env
+.env.*
+!.env.example
+
+# Local secret files
+secrets.yml
+secrets.yaml
+secrets.json
 
 # User-specific files
 *.rsuser
@@ -270,11 +277,6 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 ServiceFabricBackup/
 *.rptproj.bak
-
-# SQL Server files
-*.mdf
-*.ldf
-*.ndf
 
 # Business Intelligence projects
 *.rdl.data

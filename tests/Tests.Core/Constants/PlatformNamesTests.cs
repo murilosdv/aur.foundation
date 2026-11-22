@@ -10,7 +10,7 @@ public sealed class PlatformNamesCollection;
 [Trait("Feature", "Platform names")]
 public sealed class PlatformNamesTests
 {
-    public static TheoryData<string> InvalidPrefixes => new() { "", "Acme", "1acme", "ac-me", "ac me" };
+    public static TheoryData<string> InvalidPrefixes => ["", "Acme", "1acme", "ac-me", "ac me"];
 
     [Fact(DisplayName = "Every name is built from the prefix, aur by default")]
     public void NamesFollowThePrefix()

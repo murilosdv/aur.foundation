@@ -7,14 +7,14 @@ Composite actions in `.github/actions`, used by this repository's workflows and 
 | Action | Does | Inputs |
 |---|---|---|
 | `conventional-commits` | Fails when a commit between two SHAs, or the pull request title when given, is not a Conventional Commit. Needs `fetch-depth: 0`. | `base-sha`, `head-sha`, `title` |
-| `detect-changed-packages` | Lists the packages whose `src` folder or `Versions.props` line changed, as a JSON array for a matrix. Needs `fetch-depth: 0`. | `base-sha`, `head-sha` |
-| `check-version-sync` | Reads a package's version and fails unless its `src` and version changed together and the changelog has the entry for that version. | `package-name`, `base-sha`, `head-sha`, `skip-check` |
-| `start-services` | Starts `postgres` and/or `sqlserver` containers (dev-sbx ports and passwords) and waits until healthy. | `services` (empty starts nothing) |
+| `detect-changed-packages` | Lists the packages whose `src` folder, a dependency of them in `Directory.Packages.props`, or `Versions.props` line changed, as a JSON array for a matrix. Needs `fetch-depth: 0`. | `base-sha`, `head-sha` |
+| `check-version-sync` | Reads a package's version and fails unless its `src` or its dependencies (`Directory.Packages.props`) changed exactly when its version did, and the changelog has the entry for that version. | `package-name`, `base-sha`, `head-sha`, `skip-check` |
+| `start-services` | Starts the `postgres` container (dev-sbx port and password) and waits until healthy. | `services` (empty starts nothing) |
 | `build-test` | Installs the SDK, builds, runs a test project, optionally with Cobertura coverage. | `project`, `test-project`, `configuration`, `coverage-file`, `global-json-file` |
 | `coverage-summary` | Writes a Cobertura report as a table in the job summary. | `name`, `file-name`, `class-filters` |
 | `pack-package` | Packs a project into `./nupkg`. | `project`, `configuration` |
-| `publish-package` | Pushes `./nupkg` to a NuGet feed (the owner's GitHub Packages by default). | `api-key`, `source` |
-| `create-release` | Creates a GitHub release from the published records, with the changelog entry of each published package and version as the notes. | `records-dir`, `changelog`, `token` |
+| `publish-package` | Pushes `./nupkg` to a NuGet feed (nuget.org by default). | `api-key`, `source` |
+| `create-release` | Creates a GitHub release from the published records, with a link to each version on nuget.org and the changelog entry of each published package and version as the notes, and a short title (the packages up to three, otherwise the shared version or the date with the package count). | `records-dir`, `changelog`, `token` |
 
 ## Use
 

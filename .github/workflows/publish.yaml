@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       skip-version-sync:
-        description: Bypass the "src and Versions.props change together" check for this run (a one-off fix, for example a version corrected after the fact)
+        description: Bypass the "the package and its version change together" check for this run (a one-off fix, for example a version corrected after the fact)
         required: false
         default: false
         type: boolean
@@ -19,7 +19,7 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
+  id-token: write
 
 jobs:
   detect:

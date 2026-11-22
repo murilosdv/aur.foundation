@@ -68,6 +68,10 @@ jobs:
     name: Package
     needs: detect
     if: needs.detect.outputs.any == 'true'
+    # Nothing is published here, but a called workflow may not ask for more than its caller grants, and its publish job asks for id-token.
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       fail-fast: false
       matrix:

@@ -17,22 +17,23 @@ public sealed class CorsConfigurationTests
 {
     private const string Origin = "https://app.example.com";
 
-    public static TheoryData<string, CorsPolicyOptions, string> RefusedPolicies => new()
+    public static TheoryData<string, string, bool, string> RefusedPolicies => new()
     {
-        { Environments.Development, new() { AllowedOrigins = ["*"], AllowCredentials = true }, "credentials with a wildcard" },
-        { Environments.Production, new() { AllowedOrigins = ["*"] }, "any origin" },
-        { Environments.Development, new() { AllowedOrigins = ["https://app.example.com/path"] }, "invalid origin" },
-        { Environments.Development, new() { AllowedOrigins = ["https://app.example.com/"] }, "invalid origin" },
-        { Environments.Development, new() { AllowedOrigins = ["not a url"] }, "invalid origin" },
-        { Environments.Production, new() { AllowedOrigins = ["http://localhost:3000"] }, "local origin" },
-        { Environments.Production, new() { AllowedOrigins = ["https://web.localhost"] }, "local origin" },
+        { Environments.Development, "*", true, "credentials with a wildcard" },
+        { Environments.Production, "*", false, "any origin" },
+        { Environments.Development, "https://app.example.com/path", false, "invalid origin" },
+        { Environments.Development, "https://app.example.com/", false, "invalid origin" },
+        { Environments.Development, "not a url", false, "invalid origin" },
+        { Environments.Production, "http://localhost:3000", false, "local origin" },
+        { Environments.Production, "https://web.localhost", false, "local origin" },
     };
 
     [Theory(DisplayName = "A policy that is unsafe or malformed stops the startup, naming the reason")]
     [MemberData(nameof(RefusedPolicies))]
-    public void UnsafePolicyIsRefused(string environment, CorsPolicyOptions policy, string reason)
+    public void UnsafePolicyIsRefused(string environment, string origin, bool allowCredentials, string reason)
     {
         // Arrange
+        var policy = new CorsPolicyOptions { AllowedOrigins = [origin], AllowCredentials = allowCredentials };
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = environment });
 
         // Act

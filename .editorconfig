@@ -125,6 +125,7 @@ dotnet_diagnostic.IDE1006.severity = error  # naming rules
 dotnet_diagnostic.IDE0005.severity = error  # unused usings
 dotnet_diagnostic.IDE0161.severity = error  # file-scoped namespace
 dotnet_diagnostic.IDE0065.severity = error  # using placement
+dotnet_diagnostic.S1125.severity = none  # SonarQube: "x is false" is the style of this repository, see docs/instructions/code-style.md
 dotnet_diagnostic.IDE0022.severity = error  # expression-bodied methods
 dotnet_diagnostic.IDE0021.severity = error  # expression-bodied constructors
 dotnet_diagnostic.IDE0011.severity = error  # braces

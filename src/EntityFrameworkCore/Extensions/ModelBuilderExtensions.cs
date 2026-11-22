@@ -35,14 +35,14 @@ public static class ModelBuilderExtensions
             .Where(x => x.BaseType is null && x.IsOwned() is false && typeof(ISoftDeletable).IsAssignableFrom(x.ClrType))
             .ToList();
 
-        foreach (var entityType in roots)
+        foreach (var clrType in roots.Select(x => x.ClrType))
         {
             // x => x.DeletedAt == null, built by hand because the entity type is only known at runtime.
-            var parameter = Expression.Parameter(entityType.ClrType, "x");
+            var parameter = Expression.Parameter(clrType, "x");
             var deletedAt = Expression.Property(parameter, nameof(ISoftDeletable.DeletedAt));
             var notDeleted = Expression.Lambda(Expression.Equal(deletedAt, Expression.Constant(null, typeof(DateTimeOffset?))), parameter);
 
-            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(QueryFilters.SoftDelete, notDeleted);
+            modelBuilder.Entity(clrType).HasQueryFilter(QueryFilters.SoftDelete, notDeleted);
         }
 
         return modelBuilder;
