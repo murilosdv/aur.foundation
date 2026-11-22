@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Aurore.Foundation.AspNetCore.RequestPipeline.Filters;
 using Aurore.Foundation.Core.RequestPipeline;
@@ -160,6 +161,24 @@ public sealed class IdempotencyFilterTests : IAsyncDisposable
         Assert.Contains("\"id\":1", await HttpContextFactory.ReadBodyAsync(response));
     }
 
+    [Fact(DisplayName = "A replay stops when the client has already gone away")]
+    public async Task ReplayStopsWhenTheRequestIsAborted()
+    {
+        // Arrange
+        await Invoke("alice", "key-1", _ => Ok(1));
+        var replay = await Invoke("alice", "key-1", _ => Ok(1));
+        var response = HttpContextFactory.Create(_provider, "alice", "POST", "/orders");
+        using var aborted = new CancellationTokenSource();
+        await aborted.CancelAsync();
+        response.RequestAborted = aborted.Token;
+
+        // Act
+        var act = () => ((IResult)replay!).ExecuteAsync(response);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(act);
+    }
+
     [Fact(DisplayName = "The first response is the endpoint's own result, not a replay")]
     public async Task FirstResponseIsTheEndpointsOwnResult()
     {
@@ -181,14 +200,16 @@ public sealed class IdempotencyFilterTests : IAsyncDisposable
         return services.BuildServiceProvider();
     }
 
-    private static IResult Ok(int value)
+    private static Ok<Payload> Ok(int value)
     {
-        return TypedResults.Ok(new { value });
+        return TypedResults.Ok(new Payload(value));
     }
+
+    private sealed record Payload(int Value);
 
     private static int? StatusOf(object? result)
     {
-        return Assert.IsAssignableFrom<IStatusCodeHttpResult>(result).StatusCode;
+        return Assert.IsType<IStatusCodeHttpResult>(result, exactMatch: false).StatusCode;
     }
 
     private async Task<object?> Invoke(

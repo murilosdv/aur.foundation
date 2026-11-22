@@ -24,32 +24,32 @@ internal sealed class UnexpectedExceptionHandler(ILogger<UnexpectedExceptionHand
     /// Writes the problem response for the exception. Always handles it, so nothing falls through to the framework's
     /// default page.
     /// </summary>
-    /// <param name="context">The HTTP context.</param>
+    /// <param name="httpContext">The HTTP context.</param>
     /// <param name="exception">The exception that escaped.</param>
     /// <param name="cancellationToken">A token to cancel the response.</param>
     /// <returns>True: the exception is always handled here.</returns>
     public async ValueTask<bool> TryHandleAsync(
-        HttpContext context,
+        HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
         switch (exception)
         {
-            case OperationCanceledException when context.RequestAborted.IsCancellationRequested:
+            case OperationCanceledException when httpContext.RequestAborted.IsCancellationRequested:
                 logger.LogDebug("The caller closed the request before it completed.");
-                context.Response.StatusCode = ClientClosedRequestStatusCode;
+                httpContext.Response.StatusCode = ClientClosedRequestStatusCode;
 
                 return true;
 
             case BadHttpRequestException badRequest:
                 logger.LogWarning("Malformed request rejected with {StatusCode}: {Reason}", badRequest.StatusCode, badRequest.Message);
-                await WriteProblemAsync(context, badRequest.StatusCode, "The request could not be processed.");
+                await WriteProblemAsync(httpContext, badRequest.StatusCode, "The request could not be processed.");
 
                 return true;
 
             default:
                 logger.LogError(exception, "An unexpected error occurred.");
-                await WriteProblemAsync(context, StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+                await WriteProblemAsync(httpContext, StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
 
                 return true;
         }

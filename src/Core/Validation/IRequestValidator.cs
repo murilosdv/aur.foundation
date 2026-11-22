@@ -8,6 +8,6 @@ namespace Aurore.Foundation.Core.Validation;
 /// <see cref="IFeatureValidator{T}"/>.
 /// </summary>
 /// <typeparam name="T">The request type being validated.</typeparam>
-public interface IRequestValidator<T> : IValidator<T>
+public interface IRequestValidator<in T> : IValidator<T>
 {
 }

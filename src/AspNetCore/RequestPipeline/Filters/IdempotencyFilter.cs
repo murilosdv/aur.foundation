@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -149,6 +150,7 @@ internal sealed class IdempotencyFilter(
         JsonElement? Body,
         Dictionary<string, string[]> Headers);
 
+    [SuppressMessage("Major Code Smell", "S3871:Exception types should be \"public\"", Justification = "Private on purpose: only this filter throws and catches it, to keep a result out of the cache")]
     private sealed class NotCacheableResultException : Exception;
 
     private sealed class ReplayedResult(IdempotencyCacheEntry entry) : IResult, IStatusCodeHttpResult, IValueHttpResult
@@ -168,7 +170,7 @@ internal sealed class IdempotencyFilter(
             httpContext.Response.Headers[CustomHeaderNames.IdempotencyReplayed] = "true";
 
             return entry.Body is { } body
-                ? httpContext.Response.WriteAsJsonAsync(body)
+                ? httpContext.Response.WriteAsJsonAsync(body, httpContext.RequestAborted)
                 : Task.CompletedTask;
         }
     }

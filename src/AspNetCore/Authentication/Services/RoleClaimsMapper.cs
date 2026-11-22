@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
@@ -17,6 +18,7 @@ internal static class RoleClaimsMapper
     /// <summary>
     /// Adds the token's roles to the identity as role claims, skipping any it already has.
     /// </summary>
+    [SuppressMessage("Major Code Smell", "S3267:Loops should be simplified with LINQ expressions", Justification = "Add has a side effect: the check belongs in the loop, not in a Where")]
     internal static void Map(ClaimsIdentity identity, IdentityProviderKind provider, string audience)
     {
         var known = identity.FindAll(ClaimTypes.Role).Select(x => x.Value).ToHashSet(StringComparer.Ordinal);

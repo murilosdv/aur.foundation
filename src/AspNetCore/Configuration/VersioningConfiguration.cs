@@ -29,7 +29,6 @@ public static class VersioningConfiguration
             .AddApiVersioning(options =>
             {
                 options.ReportApiVersions = true;
-                options.DefaultApiVersion = new ApiVersion(1);
                 options.ApiVersionReader = new UrlSegmentApiVersionReader();
 
                 foreach (var version in endpoints.Versions)

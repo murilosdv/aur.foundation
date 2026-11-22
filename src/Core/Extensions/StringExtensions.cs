@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using Humanizer;
@@ -33,13 +34,17 @@ public static class StringExtensions
         var normalized = value.Normalize(NormalizationForm.FormD);
         var builder = new StringBuilder(normalized.Length);
 
-        foreach (var c in normalized)
+        foreach (var c in normalized.Where(IsNotAccent))
         {
-            if (CharUnicodeInfo.GetUnicodeCategory(c) is not UnicodeCategory.NonSpacingMark)
-                builder.Append(c);
+            builder.Append(c);
         }
 
         return builder.ToString().Normalize(NormalizationForm.FormC);
+
+        static bool IsNotAccent(char c)
+        {
+            return CharUnicodeInfo.GetUnicodeCategory(c) is not UnicodeCategory.NonSpacingMark;
+        }
     }
 
     /// <summary>

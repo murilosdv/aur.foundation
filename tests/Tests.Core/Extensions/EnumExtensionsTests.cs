@@ -6,13 +6,12 @@ namespace Aurore.Foundation.Tests.Core.Extensions;
 [Trait("Feature", "Enum parsing")]
 public sealed class EnumExtensionsTests
 {
-    public static TheoryData<string> NotMembers => new()
-    {
+    public static TheoryData<string> NotMembers => [
         "",
         "purple",
         "99", // a number that parses but is not a member
         "Red,Green", // a combination that parses but is not a member
-    };
+    ];
 
     [Theory(DisplayName = "A name is parsed whatever its casing")]
     [InlineData("Green")]

@@ -26,7 +26,7 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
     /// <summary>
     /// The settings of the database created for this fixture.
     /// </summary>
-    public PostgresOptions Options { get; } = new();
+    public PostgresOptions Options { get; } = [];
 
     /// <summary>
     /// The settings of the server's maintenance database.
@@ -101,6 +101,8 @@ public class PostgresFixture : IAsyncLifetime, IDatabaseFixture
         await connection.OpenAsync();
         await using var drop = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_database}\" WITH (FORCE)", connection);
         await drop.ExecuteNonQueryAsync();
+
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

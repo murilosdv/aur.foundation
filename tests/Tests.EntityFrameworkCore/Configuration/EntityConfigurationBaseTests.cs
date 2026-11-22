@@ -1,3 +1,4 @@
+using System;
 using Aurore.Foundation.Core.Entities;
 using Aurore.Foundation.EntityFrameworkCore.Configuration;
 
@@ -6,20 +7,20 @@ namespace Aurore.Foundation.Tests.EntityFrameworkCore.Configuration;
 [Trait("Feature", "Entity configuration")]
 public sealed class EntityConfigurationBaseTests
 {
-    public static TheoryData<Probe, string> TableNames => new()
+    public static TheoryData<Type, string> TableNames => new()
     {
-        { new Probe<Author>(), "Authors" },
-        { new Probe<AuthorEntity>(), "Authors" },
-        { new Probe<LegalEntityDocument>(), "LegalEntityDocuments" },
-        { new Probe<Entity>(), "Entities" },
+        { typeof(Author), "Authors" },
+        { typeof(AuthorEntity), "Authors" },
+        { typeof(LegalEntityDocument), "LegalEntityDocuments" },
+        { typeof(Entity), "Entities" },
     };
 
     [Theory(DisplayName = "The table is the entity name in the plural, losing only a trailing Entity")]
     [MemberData(nameof(TableNames))]
-    public void TableIsThePluralOfTheEntityName(Probe probe, string expected)
+    public void TableIsThePluralOfTheEntityName(Type entity, string expected)
     {
         // Act
-        var table = probe.Table;
+        var table = ((Probe)Activator.CreateInstance(typeof(Probe<>).MakeGenericType(entity))!).Table;
 
         // Assert
         Assert.Equal(expected, table);

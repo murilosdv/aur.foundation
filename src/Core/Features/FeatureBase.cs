@@ -10,7 +10,7 @@ namespace Aurore.Foundation.Core.Features;
 /// </summary>
 public abstract class FeatureBase : IFeature
 {
-    internal FeatureBase()
+    private protected FeatureBase()
     {
     }
 
@@ -30,8 +30,8 @@ public abstract class FeatureBase : IFeature
     internal ValueTask<Result> RunAsync(
         Type requestType,
         object request,
-        CancellationToken cancellationToken,
-        FeatureDelegate handler)
+        FeatureDelegate handler,
+        CancellationToken cancellationToken)
     {
         var context = new FeatureContext
         {

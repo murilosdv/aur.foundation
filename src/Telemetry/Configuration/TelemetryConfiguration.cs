@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Aurore.Foundation.Core.Application.Models;
 using Aurore.Foundation.Core.Constants;
@@ -147,6 +148,7 @@ public static class TelemetryConfiguration
             });
     }
 
+    [SuppressMessage("Major Code Smell", "S3241:Methods should not return values that are never used", Justification = "Same fluent shape as ConfigureLogging and ConfigureMetrics")]
     private static OpenTelemetryBuilder ConfigureTracing(
         this OpenTelemetryBuilder builder,
         AppInformationOptions appInfo,

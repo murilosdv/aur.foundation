@@ -12,7 +12,7 @@ namespace Aurore.Foundation.Telemetry;
 /// logged once at startup to make a wrong endpoint or protocol easy to spot.
 /// </summary>
 [ExcludeFromCodeCoverage]
-internal sealed class TelemetryStartupLogger(
+internal sealed partial class TelemetryStartupLogger(
     ILogger<TelemetryStartupLogger> logger,
     TelemetryOptions telemetry)
     : IHostedService
@@ -20,11 +20,7 @@ internal sealed class TelemetryStartupLogger(
     /// <param name="cancellationToken">A token to cancel the start.</param>
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Telemetry is exported with {Protocol} to {Endpoint}; traces sampled at {SamplingRatio:P0}",
-            telemetry.Otlp.Protocol,
-            telemetry.Otlp.Endpoint,
-            telemetry.Tracing.SamplingRatio);
+        LogExport(telemetry.Otlp.Protocol, telemetry.Otlp.Endpoint, telemetry.Tracing.SamplingRatio);
 
         return Task.CompletedTask;
     }
@@ -34,4 +30,7 @@ internal sealed class TelemetryStartupLogger(
     {
         return Task.CompletedTask;
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Telemetry is exported with {Protocol} to {Endpoint}; traces sampled at {SamplingRatio:P0}")]
+    private partial void LogExport(string protocol, string endpoint, double samplingRatio);
 }

@@ -6,44 +6,15 @@ using System.Text.Json;
 namespace Aurore.Foundation.Core.Pagination.Models;
 
 /// <summary>
-/// One allowed field of a SortMap: how to order by it, and what a cursor needs from it (read its value from an item, and
-/// compare against a value that came back in a cursor).
+/// The field of a SortMap that is read from the property <typeparamref name="TKey"/> of <typeparamref name="T"/>.
 /// </summary>
-internal abstract class SortField<T>
-{
-    /// <summary>
-    /// The type of the property.
-    /// </summary>
-    internal abstract Type KeyType { get; }
-
-    /// <summary>
-    /// Orders the query by the field. The first ordering uses OrderBy, the following ones ThenBy.
-    /// </summary>
-    internal abstract IOrderedQueryable<T> Order(IQueryable<T> query, SortDirection direction, bool first);
-
-    /// <summary>
-    /// Reads the value of the field from an item, ready to go into a cursor.
-    /// </summary>
-    internal abstract JsonElement Read(T item);
-
-    /// <summary>
-    /// The field's expression, written for the given parameter so several fields can share one lambda.
-    /// </summary>
-    internal abstract Expression Member(ParameterExpression parameter);
-
-    /// <summary>
-    /// The value that came back in a cursor, as an expression of the field's type. Throws JsonException when it does not fit.
-    /// </summary>
-    internal abstract Expression Bound(JsonElement value);
-}
-
-internal sealed class SortField<T, TKey>(Expression<Func<T, TKey>> key) : SortField<T>
+internal sealed class SortField<T, TKey>(Expression<Func<T, TKey>> key) : ISortField<T>
 {
     private readonly Lazy<Func<T, TKey>> _read = new(key.Compile);
 
-    internal override Type KeyType => typeof(TKey);
+    public Type KeyType => typeof(TKey);
 
-    internal override IOrderedQueryable<T> Order(IQueryable<T> query, SortDirection direction, bool first)
+    public IOrderedQueryable<T> Order(IQueryable<T> query, SortDirection direction, bool first)
     {
         return (first, direction) switch
         {
@@ -54,17 +25,17 @@ internal sealed class SortField<T, TKey>(Expression<Func<T, TKey>> key) : SortFi
         };
     }
 
-    internal override JsonElement Read(T item)
+    public JsonElement Read(T item)
     {
         return JsonSerializer.SerializeToElement(_read.Value(item));
     }
 
-    internal override Expression Member(ParameterExpression parameter)
+    public Expression Member(ParameterExpression parameter)
     {
         return new Replace(key.Parameters[0], parameter).Visit(key.Body);
     }
 
-    internal override Expression Bound(JsonElement value)
+    public Expression Bound(JsonElement value)
     {
         var bound = value.Deserialize<TKey>() ?? throw new JsonException("A cursor value cannot be null.");
 

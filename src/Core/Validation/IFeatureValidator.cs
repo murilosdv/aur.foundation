@@ -7,6 +7,6 @@ namespace Aurore.Foundation.Core.Validation;
 /// apart from <see cref="IRequestValidator{T}"/> means one validator is never run twice for the same request.
 /// </summary>
 /// <typeparam name="T">The type being validated.</typeparam>
-public interface IFeatureValidator<T> : IValidator<T>
+public interface IFeatureValidator<in T> : IValidator<T>
 {
 }

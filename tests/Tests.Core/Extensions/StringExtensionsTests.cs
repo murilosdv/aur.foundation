@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Aurore.Foundation.Core.Extensions;
 
 namespace Aurore.Foundation.Tests.Core.Extensions;
@@ -6,18 +7,20 @@ namespace Aurore.Foundation.Tests.Core.Extensions;
 [Trait("Feature", "String helpers")]
 public sealed class StringExtensionsTests
 {
-    public static TheoryData<Func<string?, string>> NullToEmpty => new()
+    private static readonly Dictionary<string, Func<string?, string>> _conversions = new()
     {
-        x => x.ToTitleCase(),
-        x => x.ToSentenceCase(),
-        x => x.ToPascalCase(),
-        x => x.ToCamelCase(),
-        x => x.ToSnakeCase(),
-        x => x.ToSlugCase(),
-        x => x.ToPlural(),
-        x => x.ToSingular(),
-        x => x.RemoveDiacritics(),
+        ["ToTitleCase"] = x => x.ToTitleCase(),
+        ["ToSentenceCase"] = x => x.ToSentenceCase(),
+        ["ToPascalCase"] = x => x.ToPascalCase(),
+        ["ToCamelCase"] = x => x.ToCamelCase(),
+        ["ToSnakeCase"] = x => x.ToSnakeCase(),
+        ["ToSlugCase"] = x => x.ToSlugCase(),
+        ["ToPlural"] = x => x.ToPlural(),
+        ["ToSingular"] = x => x.ToSingular(),
+        ["RemoveDiacritics"] = x => x.RemoveDiacritics(),
     };
+
+    public static TheoryData<string> NullToEmpty => [.. _conversions.Keys];
 
     public static TheoryData<string?, string[]> Words => new()
     {
@@ -52,13 +55,13 @@ public sealed class StringExtensionsTests
 
     [Theory(DisplayName = "A null text becomes an empty string in every conversion")]
     [MemberData(nameof(NullToEmpty))]
-    public void NullBecomesEmpty(Func<string?, string> convert)
+    public void NullBecomesEmpty(string conversion)
     {
         // Arrange
         string? value = null;
 
         // Act
-        var converted = convert(value);
+        var converted = _conversions[conversion](value);
 
         // Assert
         Assert.Equal(string.Empty, converted);

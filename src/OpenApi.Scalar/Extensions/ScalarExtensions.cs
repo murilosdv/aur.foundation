@@ -57,7 +57,7 @@ public static class ScalarExtensions
             return options;
 
         return options
-            .AddPreferredSecuritySchemes([SecuritySchemes.OAuth2])
+            .AddPreferredSecuritySchemes(SecuritySchemes.OAuth2)
             .AddAuthorizationCodeFlow(SecuritySchemes.OAuth2, flow => flow
                 .WithClientId(apiDocs.OAuthClientId)
                 .WithPkce(Pkce.Sha256)

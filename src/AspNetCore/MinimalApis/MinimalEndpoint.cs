@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Aurore.Foundation.AspNetCore.MinimalApis.Abstractions;
 using Aurore.Foundation.Core.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +9,7 @@ namespace Aurore.Foundation.AspNetCore.MinimalApis;
 /// <summary>
 /// One endpoint of the resource group TResourceGroup. Override Map to declare the route and handler.
 /// </summary>
+[SuppressMessage("Major Code Smell", "S2326:Unused type parameters should be removed", Justification = "The type parameter binds the endpoint to its resource group")]
 public abstract class MinimalEndpoint<TResourceGroup> : IMinimalEndpoint
     where TResourceGroup : ResourceGroup
 {

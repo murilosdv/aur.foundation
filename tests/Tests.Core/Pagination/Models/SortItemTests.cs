@@ -13,7 +13,7 @@ public sealed class SortItemTests
         { " Name : DESC ", "Name", SortDirection.Desc },
     };
 
-    public static TheoryData<string> Invalid => new() { string.Empty, "  ", ":desc", "name:sideways", "name:asc:desc" };
+    public static TheoryData<string> Invalid => [string.Empty, "  ", ":desc", "name:sideways", "name:asc:desc"];
 
     [Theory(DisplayName = "An ordering is read as field and direction, defaulting to ascending")]
     [MemberData(nameof(Valid))]

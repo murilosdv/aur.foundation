@@ -37,7 +37,7 @@ internal static class Keyset
         return Expression.Lambda<Func<T, bool>>(any!, row);
     }
 
-    private static Expression Compare(Expression member, Expression bound, bool greater)
+    private static BinaryExpression Compare(Expression member, Expression bound, bool greater)
     {
         var type = member.Type;
 
