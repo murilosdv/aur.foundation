@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 Read [the instructions file](./docs/instructions/changelog.md) to learn what and how to write here.
 
+## [OpenApi.Scalar-1.0.0-preview.4] - 2026-11-23
+
+### Changed
+
+- `Scalar.AspNetCore.Microsoft` updated from 3.1.1 to 3.2.0.
+
+---
+
 ## [AspNetCore-1.0.0-preview.4] - 2026-11-22
 
 ### Changed
