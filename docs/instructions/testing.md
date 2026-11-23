@@ -47,7 +47,7 @@ dotnet test --solution Foundation.slnx --filter-not-trait "Category=Integration"
 make test                                                                         # everything in a Linux container, with coverage
 ```
 
-`make` also has `test-local` (runs `dotnet format` first, then the tests), `report` (opens the coverage report), `clean`, `sbx-up` / `sbx-down` for the dev-sbx and `sonar` (starts the dev-sbx with SonarQube, begin, build, tests with coverage, end, and removes SonarQube alone (the rest of the dev-sbx stays up); the token is `SONAR_TOKEN` in `.env`). Results go to `artifacts/test-results`, the coverage report to `artifacts/coverage-report/index.html`.
+`make` also has `test-local` (runs `dotnet format` first, then the tests), `report` (opens the coverage report), `clean`, `sbx-up` / `sbx-down` for the dev-sbx and `sonar` (starts the dev-sbx with SonarQube, begin, build, tests with coverage, end, and leaves SonarQube running so the result can be read (`make sonar-down` in the dev-sbx removes it); the token is `SONAR_TOKEN` in `.env`). Results go to `artifacts/test-results`, the coverage report to `artifacts/coverage-report/index.html`.
 The container run matches CI (Linux, Release) and reaches the server on the `dev-sbx` network as `sbx-postgres`.
 
 ## Coverage
