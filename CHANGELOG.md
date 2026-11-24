@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 Read [the instructions file](./docs/instructions/changelog.md) to learn what and how to write here.
 
+## [AspNetCore-1.0.0-preview.5] - 2026-11-24
+
+### Added
+
+- `AddStandardBearerToken(token)` sends a static token to an HTTP dependency as `Authorization: Bearer <token>`. The token can come with or without the `Bearer ` prefix, in any case, and the header always carries it exactly once. A missing, empty or prefix-only token fails at registration, naming the dependency.
+
+---
+
 ## [OpenApi.Scalar-1.0.0-preview.4] - 2026-11-23
 
 ### Changed

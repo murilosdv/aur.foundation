@@ -36,7 +36,7 @@ Resolve a named client with `IHttpClientFactory.CreateClient("billing")`; a type
 | `BaseUrl` | required | The base URL of the upstream service. Absolute; **a local address is refused in production**. |
 | `RequestHeaders` | `{}` | Headers sent with every request: `Accept`, `User-Agent`, API-version headers. |
 | `PropagateCorrelationId` | `true` | Forwards the current `Correlation-Id` to the upstream. Turn off for third-party APIs that should not see internal ids. |
-| `ApiKey` | none | A static header, for upstreams that authenticate by key. Holds values only; see below. |
+| `ApiKey` | none | A static header, for upstreams that authenticate by key. Holds values only; see below. A static bearer token needs no section: pass it to `AddStandardBearerToken`. |
 | `ClientCredentials` | none | OAuth2 client credentials, for upstreams that authenticate by token. |
 | `HealthCheck` | none | When present, the upstream is part of the readiness checks. |
 
@@ -46,7 +46,7 @@ The authentication sections **only hold values**: the application chooses which 
 
 | Key | Default | Meaning |
 |---|---|---|
-| `HeaderName` | `X-Api-Key` | The header that carries the value (can be `Authorization` for a static bearer token). Not empty. |
+| `HeaderName` | `X-Api-Key` | The header that carries the value. Not empty. For a static bearer token, use [`AddStandardBearerToken`](#authenticating) instead. |
 | `Value` | empty | The key or token. Required. **Supply it through an environment variable or a secret store.** |
 
 ### `ClientCredentials`
@@ -81,9 +81,13 @@ See [health checks](./health-checks.md).
 Chain one of these on the registration. Without any, the client is anonymous.
 
 ```csharp
-// Static header
+// Static header (X-Api-Key, …)
 services.AddStandardHttpDependency("inventory", inventory)
     .AddStandardApiKey(inventory.ApiKey);
+
+// Static bearer token: Authorization: Bearer <token>
+services.AddStandardHttpDependency("catalog", catalog)
+    .AddStandardBearerToken(configuration["Catalog:Token"]);
 
 // OAuth2 client credentials
 services.AddStandardHttpDependency("orders", orders)
@@ -94,6 +98,8 @@ services.AddTransient<SigningHandler>();
 services.AddStandardHttpDependency("partner", partner)
     .AddHttpMessageHandler<SigningHandler>();
 ```
+
+**Bearer token**: the token is sent as `Authorization: Bearer <token>` with every request, replacing an `Authorization` header the caller set. It can be given with or without the `Bearer ` prefix, in any case (`abc`, `Bearer abc`, `bearer abc` all send `Bearer abc`); the prefix is never doubled. A missing, empty or prefix-only token fails at registration, naming the dependency. **Supply it through an environment variable or a secret store.** For a token that expires, use client credentials or your own handler.
 
 **Client credentials** (RFC 6749 §4.4): the token is requested from `TokenUrl`, cached **per dependency** until shortly before it expires, and sent as `Authorization: Bearer`. The cache is a singleton, because HTTP handlers are recreated every few minutes and would otherwise lose it. A token endpoint that refuses the request, or answers without a token, throws `HttpRequestException`.
 

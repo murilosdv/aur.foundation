@@ -20,7 +20,7 @@ It references [Core](../core/README.md), which holds the settings models this pa
 | Minimal endpoints | `ResourceGroup` and `MinimalEndpoint<T>`: discovery, URL versions, deprecation and sunset, conventions that stack. | [Minimal endpoints](./minimal-endpoints.md) |
 | Results to HTTP | `ToHttpResult()` and the problem body. | [Results to HTTP](./results-to-http.md) |
 | Health checks | `/health/live`, `/health/ready`, `/health/status`. | [Health checks](./health-checks.md) |
-| HTTP dependencies | Clients for the services this one calls: resilience, correlation id, API key, OAuth2 client credentials, health. | [HTTP dependencies](./http-dependencies.md) |
+| HTTP dependencies | Clients for the services this one calls: resilience, correlation id, API key, static bearer token, OAuth2 client credentials, health. | [HTTP dependencies](./http-dependencies.md) |
 | Settings | Strict binding of `appsettings.json`, the validators, hosting. | [Settings](./settings.md) |
 
 ## The wiring order
