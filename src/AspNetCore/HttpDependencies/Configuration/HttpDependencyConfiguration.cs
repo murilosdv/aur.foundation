@@ -17,7 +17,7 @@ public static class HttpDependencyConfiguration
     /// <summary>
     /// Registers a named HttpClient for an upstream dependency with its base address, default headers, Correlation-Id
     /// propagation and the standard resilience pipeline. Resolve it with <c>IHttpClientFactory.CreateClient(name)</c>.
-    /// Chain <see cref="AddStandardApiKey"/>, <see cref="AddStandardClientCredentials"/> or a custom
+    /// Chain <see cref="AddStandardApiKey"/>, <see cref="AddStandardBearerToken"/>, <see cref="AddStandardClientCredentials"/> or a custom
     /// <c>AddHttpMessageHandler&lt;T&gt;()</c> to authenticate; without any of them the client is anonymous.
     /// </summary>
     /// <param name="services">The service collection.</param>
@@ -71,7 +71,7 @@ public static class HttpDependencyConfiguration
     }
 
     /// <summary>
-    /// Sends a static header with every request, e.g. <c>X-Api-Key</c> or <c>Authorization: Bearer &lt;token&gt;</c>.
+    /// Sends a static header with every request, e.g. <c>X-Api-Key</c>. For a static bearer token, use <see cref="AddStandardBearerToken"/>.
     /// </summary>
     /// <param name="builder">The client builder.</param>
     /// <param name="options">The header name and value. Nothing is added when null.</param>
@@ -82,6 +82,25 @@ public static class HttpDependencyConfiguration
             throw new InvalidOperationException($"Dependency '{builder.Name}' needs an ApiKey section with HeaderName and Value.");
 
         return builder.AddHttpMessageHandler(() => new ApiKeyHandler(options));
+    }
+
+    /// <summary>
+    /// Sends a static token as <c>Authorization: Bearer &lt;token&gt;</c> with every request, replacing an Authorization
+    /// header the caller set. The token can come with or without the "Bearer " prefix (any case): the header always
+    /// carries it exactly once.
+    /// </summary>
+    /// <param name="builder">The client builder.</param>
+    /// <param name="token">The token, with or without the "Bearer " prefix. Supply it through an environment variable or a secret store.</param>
+    /// <returns>The same builder, for chaining.</returns>
+    /// <exception cref="InvalidOperationException">The token is null, empty, or only the prefix.</exception>
+    public static IHttpClientBuilder AddStandardBearerToken(this IHttpClientBuilder builder, string? token)
+    {
+        var bare = BearerTokenHandler.Normalize(token);
+
+        if (bare.HasValue() is false)
+            throw new InvalidOperationException($"Dependency '{builder.Name}' needs a bearer token.");
+
+        return builder.AddHttpMessageHandler(() => new BearerTokenHandler(bare));
     }
 
     /// <summary>

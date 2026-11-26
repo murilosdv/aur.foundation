@@ -34,7 +34,7 @@ To restore the packages, add the registry first: [Installing](./installing.md).
 | [Minimal endpoints](./aspnetcore/minimal-endpoints.md) | Resource groups, endpoints, versions, conventions, startup checks. |
 | [Results to HTTP](./aspnetcore/results-to-http.md) | `ToHttpResult()`, status mapping, the problem body. |
 | [Health checks](./aspnetcore/health-checks.md) | Live, ready and status endpoints; tags; critical dependencies. |
-| [HTTP dependencies](./aspnetcore/http-dependencies.md) | Clients for called services: resilience, correlation id, API key, client credentials, health. |
+| [HTTP dependencies](./aspnetcore/http-dependencies.md) | Clients for called services: resilience, correlation id, API key, bearer token, client credentials, health. |
 | [Settings](./aspnetcore/settings.md) | Strict binding, validators, environments, secrets. |
 
 ### [OpenAPI](./openapi/README.md)

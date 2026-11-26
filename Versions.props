@@ -2,7 +2,7 @@
     <PropertyGroup>
         <CoreVersion>1.0.0-preview.4</CoreVersion>
         <TelemetryVersion>1.0.0-preview.4</TelemetryVersion>
-        <AspNetCoreVersion>1.0.0-preview.4</AspNetCoreVersion>
+        <AspNetCoreVersion>1.0.0-preview.5</AspNetCoreVersion>
         <OpenApiVersion>1.0.0-preview.3</OpenApiVersion>
         <OpenApiScalarVersion>1.0.0-preview.4</OpenApiScalarVersion>
         <OpenApiSwaggerVersion>1.0.0-preview.3</OpenApiSwaggerVersion>
